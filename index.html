@@ -4,7 +4,7 @@
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <title>Roomwise</title>
-<meta name="description" content="Roomwise — per-room unoccupied thermostat setback that explains its own math. Pitch deck and live simulator." />
+<meta name="description" content="Roomwise sets the heating in each empty hotel room on its own terms, and keeps a written account of why. Pitch deck and live simulator." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌡️</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -376,6 +376,11 @@
     font-size: 26px; margin-bottom: 18px;
     background: color-mix(in oklch, var(--accent-primary) 16%, var(--surface)); border: 1px solid color-mix(in oklch, var(--accent-primary) 30%, var(--border-subtle));
   }
+  .app-card .plate {
+    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; color: var(--data-label);
+    border: 1px solid var(--border-subtle); border-radius: 6px; padding: 3px 8px;
+    display: inline-block; margin-bottom: 12px; background: var(--bg-deep);
+  }
   .app-card h2 { font-family: var(--font-display); font-size: 19px; font-weight: 600; margin: 0 0 8px; }
   .app-card p { font-size: 13.5px; color: var(--data-label); line-height: 1.5; margin: 0 0 16px; }
   .app-card .go { font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); display: inline-flex; align-items: center; gap: 5px; }
@@ -393,27 +398,29 @@
 
 <div class="landing">
   <div class="landing-head">
-    <div class="kicker">The Room That Knows Itself</div>
-    <h1>Two rooms. Same night.<br/>Two different answers.</h1>
-    <p>A per-room unoccupied setback that explains its own math — and shows it live.</p>
+    <div class="kicker">Night audit · Ringvägen 98</div>
+    <h1>Room 204 holds its warmth.<br/>Room 117 never did.</h1>
+    <p>Empty rooms are not alike. Roomwise heats each one on its own terms, and writes down why.</p>
   </div>
 
   <div class="card-grid">
     <a class="app-card" href="simulator.html">
       <div class="icon">🎛️</div>
+      <div class="plate">ROOM 101</div>
       <h2>Simulator</h2>
-      <p>Drag a signal, flip a tier, kill the feed — watch the recommended setback, confidence and reasoning trace update live, same rules as production.</p>
-      <span class="go">Open simulator →</span>
+      <p>The decision engine on a workbench. Cut a feed and see what the room does about it.</p>
+      <span class="go">Unlock →</span>
     </a>
     <a class="app-card" href="pitch.html">
       <div class="icon">🖥️</div>
+      <div class="plate">ROOM 102</div>
       <h2>Pitch deck</h2>
-      <p>The full hackathon pitch — problem, architecture, signal pipeline, opportunity sizing and deployment story, as a keyboard/swipe slide deck.</p>
-      <span class="go">Open pitch →</span>
+      <p>Why hotels heat empty rooms as if someone were in them. Five minutes, arrow keys.</p>
+      <span class="go">Unlock →</span>
     </a>
   </div>
 
-  <div class="landing-foot">Ringvägen 98, Stockholm · Roomwise</div>
+  <div class="landing-foot">Front desk · Ringvägen 98, Stockholm · Roomwise</div>
 </div>
 
 <script>
