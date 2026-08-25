@@ -115,11 +115,14 @@
 
   /* Terse fragment lists: no full sentences, one idea per line. */
   .pt-list { list-style: none; margin: 0 0 26px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
-  .pt-list li { display: flex; align-items: baseline; gap: 10px; font-size: 14.5px; color: var(--data-label); line-height: 1.4; }
-  .pt-list li::before { content: "—"; color: var(--accent-primary); font-family: var(--font-mono); flex-shrink: 0; }
+  .pt-list li { font-size: 14.5px; color: var(--data-label); line-height: 1.4; padding-left: 1.3em; text-indent: -1.3em; }
+  .pt-list li::before { content: "—"; color: var(--accent-primary); font-family: var(--font-mono); margin-right: 10px; }
   .pt-list li strong { color: var(--foreground); font-weight: 600; }
   .pt-list.big li { font-size: 16px; }
   .pt-list.sm li { font-size: 12.5px; }
+  .pt-list.hero { gap: clamp(20px, 4vh, 38px); margin-top: clamp(20px, 4vh, 40px); }
+  .pt-list.hero li { font-size: clamp(19px, 3.4vh, 30px); line-height: 1.5; }
+  .pt-list.hero li::before { font-size: 1.1em; }
 
   /* ---------- slide 1: title ---------- */
   .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-primary); display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
@@ -434,19 +437,30 @@
 <div class="topbar">
   <div class="brand"><img src="assets/roomsense-logo.png" alt="" /><span><span class="r">R</span><span class="oom">oom</span><span class="sense">Sense</span></span> <span class="sub">PITCH</span></div>
   <div class="top-right">
-    <span class="slide-counter" id="slideCounter">1 / 10</span>
+    <span class="slide-counter" id="slideCounter">1 / 11</span>
     <button class="icon-btn" id="themeBtn" title="Toggle light/dark">🌙</button>
   </div>
 </div>
 
 <div class="deck" id="deck">
 
-  <!-- 1: title -->
+  <!-- 1: three-sentence pitch, dedicated -->
   <section class="slide active" data-slide="0">
+    <div class="slide-inner">
+      <h2 class="section-title" style="font-size:clamp(28px,4.5vh,40px);">TL;DR</h2>
+      <ul class="pt-list hero">
+        <li>RoomSense scans a room and works out <strong>its own</strong> setback whenever it's unoccupied</li>
+        <li>Today, every room gets the <strong>same</strong> setback, needed or not</li>
+        <li>That wastes <strong>energy and money</strong>, every empty room, every time</li>
+      </ul>
+    </div>
+  </section>
+
+  <!-- 2: title hook -->
+  <section class="slide" data-slide="1">
     <div class="slide-inner">
       <div class="kicker">RoomSense · Assa Abloy</div>
       <h1 class="headline">One night. Two rooms.<br/><span class="accent">Two different setbacks.</span></h1>
-      <p class="lede">RoomSense takes one LiDAR scan of a hotel room and computes that room's own overnight heating setback, its recovery time, and its savings. Most hotels run one flat overnight temperature for every empty room, so rooms that could safely coast much colder never do. That's real energy and carbon savings across a whole property, with the reasoning behind every degree shown, not buried in a black box.</p>
       <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--data-label);margin:22px 0 10px;">Reference example · Ringvägen 98, Stockholm</div>
       <div class="hook-rooms">
         <div class="hook-card south">
@@ -465,7 +479,7 @@
   </section>
 
   <!-- 2: problem -->
-  <section class="slide" data-slide="1">
+  <section class="slide" data-slide="2">
     <div class="slide-inner problem-grid">
       <div>
         <h2 class="section-title">Why every hotel runs one flat setback</h2>
@@ -489,7 +503,7 @@
   </section>
 
   <!-- 3: the real building -->
-  <section class="slide" data-slide="2">
+  <section class="slide" data-slide="3">
     <div class="slide-inner">
       <h2 class="section-title">The building. Not a hypothetical.</h2>
       <p class="section-lede" style="margin-bottom:20px;">Ringvägen 98, Stockholm: our reference example, as RoomSense sees it from public data alone.</p>
@@ -557,7 +571,7 @@
   </section>
 
   <!-- 4: architecture -->
-  <section class="slide" data-slide="3" data-fullbleed="1">
+  <section class="slide" data-slide="4" data-fullbleed="1">
     <div class="slide-inner">
       <h2 class="section-title">How it thinks</h2>
       <p class="section-lede" style="margin-bottom:20px;"><strong style="color:var(--foreground)">AI proposes. Deterministic math decides. Humans override.</strong> Every stage pluggable.</p>
@@ -605,7 +619,7 @@
   </section>
 
   <!-- 4: signals detail: what's real, what's mocked, what's next -->
-  <section class="slide" data-slide="4">
+  <section class="slide" data-slide="5">
     <div class="slide-inner">
       <h2 class="section-title">What's real. What's mocked. What's next.</h2>
       <p class="section-lede" style="margin-bottom:20px;">Every signal is an adapter: same shape in, any provider underneath.</p>
@@ -638,7 +652,7 @@
   </section>
 
   <!-- 6: one signal, traced -->
-  <section class="slide" data-slide="5" data-fullbleed="1">
+  <section class="slide" data-slide="6" data-fullbleed="1">
     <div class="slide-inner">
       <h2 class="section-title">One signal, end to end</h2>
       <p class="section-lede" style="margin-bottom:20px;">Outdoor temperature, from a stale cache to its exact share of the answer.</p>
@@ -670,7 +684,7 @@
   </section>
 
   <!-- 5: live dashboard / simulator -->
-  <section class="slide" data-slide="6" data-fullbleed="1" data-noscroll="1">
+  <section class="slide" data-slide="7" data-fullbleed="1" data-noscroll="1">
     <div class="slide-inner">
       <div class="dash-head">
         <h2 class="section-title" style="margin-bottom:6px;">Live dashboard: rooms of Ringvägen 98, our reference example</h2>
@@ -731,7 +745,7 @@
   </section>
 
   <!-- 8: this building, then every building -->
-  <section class="slide" data-slide="7">
+  <section class="slide" data-slide="8">
     <div class="slide-inner">
       <h2 class="section-title">This building. Then every building.</h2>
       <p class="section-lede" style="margin-bottom:20px;">Left: the per-room engine across Ringvägen 98 (our reference example, 90 rooms), vs a flat 16°C setback. Right: your portfolio.</p>
@@ -767,7 +781,7 @@
   </section>
 
   <!-- 9: deploy & scale -->
-  <section class="slide" data-slide="8">
+  <section class="slide" data-slide="9">
     <div class="slide-inner">
       <h2 class="section-title">Who buys it. Where it sits. How it scales.</h2>
       <div class="pitch-cols four">
@@ -796,7 +810,7 @@
   </section>
 
   <!-- 10: close -->
-  <section class="slide" data-slide="9">
+  <section class="slide" data-slide="10">
     <div class="slide-inner thanks-wrap">
       <h1>Every room already<br/>knows itself.</h1>
       <p style="font-size:22px;color:var(--foreground);">We taught it to speak.</p>
