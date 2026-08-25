@@ -64,8 +64,6 @@
   .icon-btn:hover { color: var(--foreground); border-color: var(--accent-primary); }
 
   .wrap { max-width: 900px; width: 100%; text-align: center; }
-  .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--data-label); margin-bottom: 14px; }
-  h1 { font-family: var(--font-display); font-size: clamp(24px, 3.6vw, 34px); font-weight: 600; margin: 0 0 28px; letter-spacing: -0.01em; }
 
   video {
     width: 100%; display: block; border-radius: 14px; border: 1px solid var(--border-subtle);
@@ -84,9 +82,7 @@
 </div>
 
 <div class="wrap">
-  <div class="kicker">No reading. 30 seconds.</div>
-  <h1>Just watch.</h1>
-  <video src="assets/roomsense-30s.mp4" controls playsinline preload="metadata"></video>
+  <video src="assets/roomsense-30s.mp4" controls playsinline autoplay muted preload="auto"></video>
 </div>
 
 <script>
