@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Roomwise — Simulator</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌡️</text></svg>">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg-deep: oklch(0.08 0.004 265);
+    --surface: oklch(0.14 0.006 265);
+    --surface-2: oklch(0.17 0.008 265);
+    --border-subtle: oklch(0.24 0.008 266);
+    --border-soft: oklch(0.30 0.01 266);
+    --accent-primary: oklch(0.62 0.19 260);
+    --accent-success: oklch(0.72 0.17 162);
+    --accent-warn: oklch(0.78 0.17 70);
+    --accent-danger: oklch(0.65 0.21 25);
+    --data-label: oklch(0.7 0.02 255);
+    --foreground: oklch(0.97 0.004 265);
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+  :root[data-theme="light"] {
+    --bg-deep: oklch(0.99 0.002 265);
+    --surface: oklch(0.965 0.004 265);
+    --surface-2: oklch(0.93 0.006 265);
+    --border-subtle: oklch(0.88 0.007 266);
+    --border-soft: oklch(0.8 0.008 266);
+    --accent-primary: oklch(0.52 0.19 260);
+    --accent-success: oklch(0.5 0.15 162);
+    --accent-warn: oklch(0.58 0.16 65);
+    --accent-danger: oklch(0.55 0.19 25);
+    --data-label: oklch(0.45 0.02 255);
+    --foreground: oklch(0.15 0.015 265);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg-deep);
+    color: var(--foreground);
+    font-family: var(--font-sans);
+    margin: 0;
+    -webkit-font-smoothing: antialiased;
+    overflow: hidden;
+    transition: background .2s ease, color .2s ease;
+  }
+  a { color: inherit; }
+  ::selection { background: color-mix(in oklch, var(--accent-primary) 35%, transparent); }
+
+  /* ---------- chrome: topbar + nav ---------- */
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px;
+    pointer-events: none;
+  }
+  .topbar > * { pointer-events: auto; }
+  .brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 15px; }
+  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary); box-shadow: 0 0 10px var(--accent-primary); }
+  .brand .sub { font-family: var(--font-mono); font-size: 9px; color: var(--data-label); letter-spacing: 0.08em; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 2px 6px; }
+  .top-right { display: flex; align-items: center; gap: 10px; }
+  .slide-counter { font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); }
+  .icon-btn {
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface);
+    color: var(--data-label); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;
+    transition: all .15s;
+  }
+  .icon-btn:hover { color: var(--foreground); border-color: var(--accent-primary); }
+
+  /* ---------- deck ---------- */
+  .deck { position: relative; width: 100%; height: 100vh; }
+  .slide {
+    position: absolute; inset: 0;
+    display: flex; flex-direction: column; justify-content: center;
+    padding: 90px 64px 76px;
+    opacity: 0; visibility: hidden; transform: translateY(14px);
+    transition: opacity .35s ease, transform .35s ease;
+    overflow-y: auto;
+  }
+  .slide.active { opacity: 1; visibility: visible; transform: translateY(0); }
+  .slide-inner { max-width: 1180px; margin: 0 auto; width: 100%; }
+  .slide[data-fullbleed="1"] .slide-inner { max-width: 1320px; }
+
+  /* A slide with a lot of content (the dashboard): the slide itself never
+     scrolls, so the header/room-picker/mode controls stay put on screen at
+     all times. Only the two long lists inside it (signal rows, reasoning
+     trace) get their own internal scroll region. */
+  .slide[data-noscroll="1"] { overflow: hidden; padding-top: 78px; padding-bottom: 20px; justify-content: flex-start; }
+  .slide[data-noscroll="1"] .slide-inner { height: 100%; min-height: 0; display: flex; flex-direction: column; }
+
+  section { padding: 0; border: none; }
+  h2.section-title { font-family: var(--font-display); font-size: clamp(24px, 3vw, 32px); font-weight: 600; margin: 0 0 12px; letter-spacing: -0.01em; }
+  p.section-lede { color: var(--data-label); font-size: 14.5px; line-height: 1.65; max-width: 68ch; margin: 0 0 28px; }
+
+  /* Terse fragment lists — no full sentences, one idea per line. */
+  .pt-list { list-style: none; margin: 0 0 26px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
+  .pt-list li { display: flex; align-items: baseline; gap: 10px; font-size: 14.5px; color: var(--data-label); line-height: 1.4; }
+  .pt-list li::before { content: "—"; color: var(--accent-primary); font-family: var(--font-mono); flex-shrink: 0; }
+  .pt-list li strong { color: var(--foreground); font-weight: 600; }
+  .pt-list.big li { font-size: 16px; }
+  .pt-list.sm li { font-size: 12.5px; }
+
+  /* ---------- slide 1: title ---------- */
+  .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: 0.14em; text-transform: uppercase; color: var(--accent-primary); display: flex; align-items: center; gap: 8px; margin-bottom: 20px; }
+  .kicker::before { content: ""; width: 22px; height: 1px; background: var(--accent-primary); }
+  h1.headline { font-family: var(--font-display); font-size: clamp(32px, 5vw, 58px); line-height: 1.05; font-weight: 700; margin: 0 0 20px; max-width: 15ch; letter-spacing: -0.01em; }
+  h1.headline .accent { background: linear-gradient(90deg, var(--accent-primary), oklch(0.72 0.15 200)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  p.lede { font-size: 17px; line-height: 1.6; color: var(--data-label); max-width: 60ch; margin: 0 0 30px; }
+  .hero-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; max-width: 700px; }
+  .stat-chip { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 15px 17px; }
+  .stat-chip .n { font-family: var(--font-mono); font-size: 21px; font-weight: 600; color: var(--foreground); }
+  .stat-chip .l { font-size: 10.5px; color: var(--data-label); margin-top: 4px; }
+
+  /* ---------- title hook: two rooms ---------- */
+  .hook-rooms { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: stretch; max-width: 860px; }
+  .hook-card { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px 22px; }
+  .hook-card.south { border-color: color-mix(in oklch, var(--accent-warn) 45%, var(--border-subtle)); background: color-mix(in oklch, var(--accent-warn) 7%, var(--surface)); }
+  .hook-card.north { border-color: color-mix(in oklch, var(--accent-primary) 45%, var(--border-subtle)); background: color-mix(in oklch, var(--accent-primary) 7%, var(--surface)); }
+  .hook-card .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--data-label); margin-bottom: 10px; }
+  .hook-card .temp { font-family: var(--font-mono); font-size: 40px; font-weight: 600; line-height: 1; }
+  .hook-card .temp small { font-size: 16px; color: var(--data-label); font-weight: 400; }
+  .hook-card .why { font-size: 12.5px; color: var(--data-label); margin-top: 9px; line-height: 1.5; }
+  .hook-vs { display: flex; align-items: center; font-family: var(--font-mono); font-size: 12px; color: var(--data-label); }
+  @media (max-width: 760px) { .hook-rooms { grid-template-columns: 1fr; } .hook-vs { justify-content: center; } }
+
+  /* ---------- Ringvägen 98 schematic ---------- */
+  .bldg-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 28px; align-items: center; }
+  @media (max-width: 900px) { .bldg-grid { grid-template-columns: 1fr; } }
+  .bldg-svg { width: 100%; height: auto; display: block; }
+  .src-list { display: flex; flex-direction: column; gap: 10px; }
+  .src-item { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 11px 14px; display: flex; gap: 10px; align-items: baseline; }
+  .src-item .s { font-family: var(--font-mono); font-size: 10px; white-space: nowrap; color: var(--accent-success); }
+  .src-item.syn .s { color: var(--accent-warn); }
+  .src-item .d { font-size: 12px; color: var(--data-label); line-height: 1.5; }
+  .src-item .d strong { color: var(--foreground); font-weight: 600; }
+
+  .pitch-cols.four { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 1000px) { .pitch-cols.four { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .pitch-cols.four { grid-template-columns: 1fr; } }
+
+  /* ---------- slide 2: problem ---------- */
+  .problem-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 44px; align-items: start; }
+  .problem-grid p { color: var(--data-label); line-height: 1.7; font-size: 14.5px; }
+  .problem-grid strong { color: var(--foreground); }
+  .callout { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px 22px; }
+  .callout .t { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--accent-warn); margin-bottom: 10px; }
+  .callout p { margin: 0; font-size: 13.5px; }
+  @media (max-width: 860px) { .problem-grid { grid-template-columns: 1fr; } }
+
+  /* ---------- opportunity calculator ---------- */
+  .opp-grid { display: grid; grid-template-columns: 0.85fr 1.15fr; gap: 20px; align-items: start; }
+  @media (max-width: 900px) { .opp-grid { grid-template-columns: 1fr; } }
+  .opp-outputs { display: flex; flex-direction: column; gap: 14px; }
+  .opp-card { background: color-mix(in oklch, var(--accent-primary) 10%, var(--surface)); border: 1px solid color-mix(in oklch, var(--accent-primary) 30%, var(--border-subtle)); border-radius: 14px; padding: 20px 22px; }
+  .opp-card .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-primary); margin-bottom: 8px; }
+  .opp-card .big { font-family: var(--font-mono); font-size: 34px; font-weight: 600; line-height: 1; }
+  .opp-card .big small { font-size: 15px; color: var(--data-label); font-weight: 400; }
+  .opp-row { margin-bottom: 16px; }
+  .opp-row:last-child { margin-bottom: 0; }
+  .opp-row .head { display: flex; justify-content: space-between; font-size: 12.5px; margin-bottom: 6px; }
+  .opp-row .head span:first-child { color: var(--foreground); font-weight: 500; }
+  .opp-row .head span:last-child { font-family: var(--font-mono); color: var(--accent-primary); }
+  .opp-note { font-size: 11px; color: var(--data-label); margin-top: 18px; line-height: 1.5; }
+
+  /* ---------- slide 3: pipeline ---------- */
+  .pipeline { display: flex; align-items: stretch; gap: 0; margin-top: 4px; flex-wrap: wrap; }
+  .pipe-stage { flex: 1; min-width: 165px; background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 16px; position: relative; }
+  .pipe-stage .icon { font-size: 19px; margin-bottom: 9px; display: block; }
+  .ico { width: 22px; height: 22px; color: var(--accent-primary); display: block; }
+  .ico.sm { width: 15px; height: 15px; flex-shrink: 0; }
+  .sig-item { display: flex; gap: 9px; align-items: flex-start; }
+  .sig-item .ico.sm { margin-top: 2px; }
+  .sig-item .body { flex: 1; }
+  .pipe-stage .t { font-family: var(--font-display); font-weight: 600; font-size: 14px; margin-bottom: 5px; }
+  .pipe-stage .d { font-size: 11px; color: var(--data-label); line-height: 1.5; }
+  .pipe-stage.hi { border-color: color-mix(in oklch, var(--accent-primary) 45%, var(--border-subtle)); background: color-mix(in oklch, var(--accent-primary) 8%, var(--surface)); }
+  .pipe-arrow { display: flex; align-items: center; justify-content: center; width: 30px; color: var(--accent-primary); font-size: 17px; flex-shrink: 0; }
+  @media (max-width: 1000px) { .pipe-arrow { display:none; } .pipeline { gap: 10px; } }
+  .signal-tags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 11px; }
+  .signal-tags span { font-family: var(--font-mono); font-size: 9px; color: var(--data-label); border: 1px solid var(--border-subtle); border-radius: 999px; padding: 3px 8px; }
+
+  /* ---------- signals detail slide ---------- */
+  .sig-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  .sig-col { border-radius: 14px; padding: 18px; border: 1px solid var(--border-subtle); background: var(--surface); }
+  .sig-col.live { border-color: color-mix(in oklch, var(--accent-success) 40%, var(--border-subtle)); background: color-mix(in oklch, var(--accent-success) 6%, var(--surface)); }
+  .sig-col.mock { border-color: color-mix(in oklch, var(--accent-warn) 40%, var(--border-subtle)); background: color-mix(in oklch, var(--accent-warn) 6%, var(--surface)); }
+  .sig-col.future { border-style: dashed; opacity: 0.88; }
+  .sig-col .h { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 4px; }
+  .sig-col.live .h { color: var(--accent-success); }
+  .sig-col.mock .h { color: var(--accent-warn); }
+  .sig-col.future .h { color: var(--data-label); }
+  .sig-col .sub { font-size: 11px; color: var(--data-label); margin-bottom: 14px; line-height: 1.5; }
+  .sig-item { padding: 9px 0; border-top: 1px solid color-mix(in oklch, var(--foreground) 8%, transparent); }
+  .sig-item:first-of-type { border-top: none; }
+  .sig-item .n { font-size: 12.5px; font-weight: 600; }
+  .sig-item .d { font-size: 11px; color: var(--data-label); margin-top: 2px; line-height: 1.45; }
+  @media (max-width: 900px) { .sig-cols { grid-template-columns: 1fr; } }
+
+  /* ---------- modifier example slide ---------- */
+  .flow-row { display: flex; align-items: stretch; gap: 0; margin-top: 10px; }
+  .flow-card { flex: 1; background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px; }
+  .flow-card .tag { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--data-label); margin-bottom: 10px; }
+  .flow-card .big { font-family: var(--font-mono); font-size: 26px; font-weight: 600; }
+  .flow-card .big small { font-size: 13px; color: var(--data-label); font-weight: 400; }
+  .flow-card .line { font-size: 12.5px; color: var(--data-label); margin-top: 8px; line-height: 1.55; }
+  .flow-card.hi { border-color: color-mix(in oklch, var(--accent-primary) 45%, var(--border-subtle)); background: color-mix(in oklch, var(--accent-primary) 8%, var(--surface)); }
+  .flow-arrow { display: flex; align-items: center; justify-content: center; width: 60px; color: var(--accent-primary); font-size: 22px; flex-shrink: 0; }
+  @media (max-width: 860px) { .flow-row { flex-direction: column; } .flow-arrow { width: auto; height: 40px; transform: rotate(90deg); } }
+
+  /* ---------- combiner formula ---------- */
+  .formula-block { font-family: var(--font-mono); font-size: clamp(13px, 1.6vw, 17px); background: var(--bg-deep); border: 1px solid var(--border-subtle); border-radius: 12px; padding: 22px 26px; line-height: 1.9; margin: 6px 0 26px; overflow-x: auto; white-space: nowrap; }
+  .formula-block .k { color: var(--accent-primary); }
+  .formula-block .op { color: var(--data-label); }
+  .control-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 18px; }
+  @media (max-width: 860px) { .control-cols { grid-template-columns: 1fr; } }
+
+  /* ---------- slide 5: pitch closing ---------- */
+  .pitch-cols { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
+  .pitch-col { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 22px; }
+  .pitch-col .num { font-family: var(--font-mono); font-size: 10.5px; color: var(--accent-primary); margin-bottom: 11px; }
+  .pitch-col h3 { font-family: var(--font-display); font-size: 16px; margin: 0 0 9px; }
+  .pitch-col p { font-size: 13px; color: var(--data-label); line-height: 1.65; margin: 0; }
+  @media (max-width: 860px) { .pitch-cols { grid-template-columns: 1fr; } }
+
+  /* ---------- slide 6: thanks ---------- */
+  .thanks-wrap { text-align: center; }
+  .thanks-wrap h1 { font-family: var(--font-display); font-size: clamp(38px, 6vw, 68px); margin: 0 0 16px; }
+  .thanks-wrap p { color: var(--data-label); font-size: 16px; max-width: 50ch; margin: 0 auto; line-height: 1.6; }
+  .thanks-tags { display: flex; justify-content: center; gap: 10px; margin-top: 30px; flex-wrap: wrap; }
+  .thanks-tags span { font-family: var(--font-mono); font-size: 11px; color: var(--data-label); border: 1px solid var(--border-subtle); border-radius: 999px; padding: 6px 14px; }
+
+  /* ---------- dashboard slide ---------- */
+  .dash-head { margin-bottom: 18px; }
+  .presets { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
+  .preset-btn {
+    font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.02em; padding: 7px 12px;
+    border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface); color: var(--data-label);
+    cursor: pointer; transition: all .15s;
+  }
+  .preset-btn:hover { color: var(--foreground); border-color: var(--accent-primary); }
+  .preset-btn.danger:hover { border-color: var(--accent-danger); }
+
+  .dash-head { flex-shrink: 0; }
+  .dash-grid { display: grid; grid-template-columns: 1.05fr 0.95fr; gap: 16px; align-items: start; flex: 1; min-height: 0; }
+  .dash-col { height: 100%; min-height: 0; display: flex; flex-direction: column; }
+  @media (max-width: 1100px) {
+    .slide[data-noscroll="1"] { overflow-y: auto; }
+    .dash-grid { grid-template-columns: 1fr; flex: none; }
+    .dash-col { height: auto; }
+  }
+
+  .panel { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 16px; flex-shrink: 0; }
+  .panel + .panel { margin-top: 12px; }
+  .panel-grow { flex: 1; min-height: 0; display: flex; flex-direction: column; }
+  .panel-grow #signalRows { flex: 1; min-height: 0; overflow-y: auto; padding-right: 6px; margin-top: -2px; }
+  .panel-title { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.1em; text-transform: uppercase; color: var(--data-label); margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between; }
+
+  .room-select { display: flex; gap: 8px; margin-bottom: 4px; }
+  .room-opt { flex: 1; text-align: left; padding: 9px 11px; border-radius: 10px; border: 1px solid var(--border-subtle); background: var(--bg-deep); cursor: pointer; transition: all .15s; }
+  .room-opt.active { border-color: var(--accent-primary); background: color-mix(in oklch, var(--accent-primary) 12%, var(--bg-deep)); }
+  .room-opt .n { font-size: 11.5px; font-weight: 600; }
+  .room-opt .d { font-family: var(--font-mono); font-size: 9px; color: var(--data-label); margin-top: 2px; }
+
+  .mode-row { display: flex; align-items: center; justify-content: space-between; padding: 11px 13px; background: var(--bg-deep); border: 1px solid var(--border-subtle); border-radius: 10px; margin-bottom: 4px; }
+  .mode-row .lbl { font-size: 12px; font-weight: 500; }
+  .switch { position: relative; width: 36px; height: 20px; border-radius: 999px; background: var(--border-soft); cursor: pointer; transition: background .15s; border: none; flex-shrink: 0; }
+  .switch.on { background: var(--accent-primary); }
+  .switch .knob { position: absolute; top: 2px; left: 2px; width: 16px; height: 16px; border-radius: 50%; background: var(--foreground); transition: transform .15s; }
+  .switch.on .knob { transform: translateX(16px); }
+
+  .signal-row { border: 1px solid var(--border-subtle); border-radius: 10px; padding: 11px 13px; margin-bottom: 9px; background: var(--bg-deep); }
+  .signal-row:last-child { margin-bottom: 0; }
+  .signal-row .head { display: flex; align-items: center; justify-content: space-between; margin-bottom: 7px; gap: 10px; }
+  .signal-row .name { font-size: 11.5px; font-weight: 500; display: flex; align-items: center; gap: 7px; }
+  .signal-row .val { font-family: var(--font-mono); font-size: 11px; color: var(--data-label); white-space: nowrap; }
+  .tier-toggle { display: flex; gap: 3px; }
+  .tier-btn { font-family: var(--font-mono); font-size: 8.5px; padding: 3px 6px; border-radius: 5px; border: 1px solid var(--border-subtle); background: transparent; color: var(--data-label); cursor: pointer; }
+  .tier-btn.active-1 { background: color-mix(in oklch, var(--accent-success) 22%, transparent); border-color: var(--accent-success); color: var(--accent-success); }
+  .tier-btn.active-2 { background: color-mix(in oklch, var(--accent-primary) 22%, transparent); border-color: var(--accent-primary); color: var(--accent-primary); }
+  .tier-btn.active-3 { background: color-mix(in oklch, var(--accent-warn) 22%, transparent); border-color: var(--accent-warn); color: var(--accent-warn); }
+
+  input[type=range] { -webkit-appearance: none; width: 100%; height: 3px; border-radius: 999px; background: var(--border-soft); outline: none; margin: 6px 0 2px; }
+  input[type=range]::-webkit-slider-thumb { -webkit-appearance: none; width: 13px; height: 13px; border-radius: 50%; background: var(--foreground); border: 2px solid var(--accent-primary); cursor: pointer; }
+  input[type=range]::-moz-range-thumb { width: 13px; height: 13px; border-radius: 50%; background: var(--foreground); border: 2px solid var(--accent-primary); cursor: pointer; }
+  input[type=range].weight-slider::-webkit-slider-thumb { border-color: var(--accent-warn); }
+  input[type=range].weight-slider::-moz-range-thumb { border-color: var(--accent-warn); }
+  .row-footer { display: flex; align-items: center; justify-content: space-between; font-family: var(--font-mono); font-size: 9.5px; color: var(--data-label); margin-top: 2px; }
+  .weight-line { display: flex; align-items: center; gap: 8px; margin-top: 8px; padding-top: 8px; border-top: 1px dashed var(--border-subtle); }
+  .weight-line span:first-child { font-family: var(--font-mono); font-size: 9px; color: var(--data-label); width: 44px; flex-shrink: 0; }
+
+  .override-input { display: flex; align-items: center; gap: 8px; margin-bottom: 14px; }
+  .override-input input[type=number] { width: 90px; background: var(--bg-deep); border: 1px solid var(--border-subtle); border-radius: 7px; padding: 8px 10px; color: var(--foreground); font-family: var(--font-mono); font-size: 13px; }
+  .override-input span { font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); }
+
+  .output-card { background: color-mix(in oklch, var(--accent-primary) 10%, var(--surface)); border: 1px solid color-mix(in oklch, var(--accent-primary) 30%, var(--border-subtle)); border-radius: 14px; padding: 20px; height: 100%; min-height: 0; display: flex; flex-direction: column; }
+  .output-card > *:not(.trace-list) { flex-shrink: 0; }
+  @media (max-width: 1100px) { .output-card { height: auto; } }
+  .output-badge { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent-primary); display: flex; align-items: center; gap: 6px; margin-bottom: 14px; }
+  .big-num { font-family: var(--font-mono); font-size: 46px; font-weight: 600; line-height: 1; }
+  .big-num small { font-size: 17px; color: var(--data-label); font-weight: 400; }
+  .big-label { font-size: 12.5px; color: var(--foreground); opacity: .8; margin-top: 4px; }
+  .delta-note { font-family: var(--font-mono); font-size: 10px; color: var(--data-label); margin-top: 6px; }
+
+  .conf-bar-wrap { margin: 16px 0 12px; }
+  .conf-bar-wrap .top { display: flex; justify-content: space-between; font-family: var(--font-mono); font-size: 9.5px; margin-bottom: 5px; }
+  .conf-bar-wrap .top span:first-child { color: var(--data-label); text-transform: uppercase; }
+  .conf-track { height: 6px; border-radius: 999px; background: color-mix(in oklch, var(--foreground) 10%, transparent); overflow: hidden; }
+  .conf-fill { height: 100%; border-radius: 999px; transition: width .25s ease, background .25s ease; }
+
+  .metric-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
+  .metric-tile { background: color-mix(in oklch, var(--bg-deep) 60%, transparent); border: 1px solid color-mix(in oklch, var(--accent-primary) 16%, var(--border-subtle)); border-radius: 8px; padding: 9px 11px; }
+  .metric-tile .l { font-family: var(--font-mono); font-size: 8.5px; text-transform: uppercase; color: var(--data-label); }
+  .metric-tile .v { font-family: var(--font-mono); font-size: 13.5px; margin-top: 3px; }
+
+  .narrative-box { background: color-mix(in oklch, var(--bg-deep) 65%, transparent); border: 1px solid color-mix(in oklch, var(--accent-primary) 12%, var(--border-subtle)); border-radius: 8px; padding: 11px 12px; font-size: 11.5px; line-height: 1.6; color: color-mix(in oklch, var(--foreground) 92%, transparent); margin-bottom: 16px; }
+
+  .trace-title { font-family: var(--font-mono); font-size: 9.5px; letter-spacing: 0.08em; text-transform: uppercase; color: var(--data-label); margin-bottom: 10px; border-top: 1px solid color-mix(in oklch, var(--accent-primary) 14%, var(--border-subtle)); padding-top: 13px; }
+  .trace-list { display: flex; flex-direction: column; gap: 6px; flex: 1; min-height: 80px; overflow-y: auto; padding-right: 4px; }
+  .trace-row { background: color-mix(in oklch, var(--bg-deep) 65%, transparent); border: 1px solid var(--border-subtle); border-radius: 7px; padding: 8px 9px; font-size: 10px; }
+  .trace-row .h { display: flex; justify-content: space-between; font-family: var(--font-mono); gap: 8px; }
+  .trace-row .h .name { color: var(--foreground); }
+  .trace-row .rationale { color: var(--data-label); margin-top: 4px; line-height: 1.5; }
+  .trace-row .contrib { font-family: var(--font-mono); color: var(--data-label); margin-top: 4px; font-size: 9px; }
+  .tier-label-1 { color: var(--accent-success); }
+  .tier-label-2 { color: var(--accent-primary); }
+  .tier-label-3 { color: var(--accent-warn); }
+
+  /* ---------- deck nav controls ---------- */
+  .nav-arrow {
+    position: fixed; top: 50%; transform: translateY(-50%); z-index: 90;
+    width: 44px; height: 44px; border-radius: 50%; border: 1px solid var(--border-subtle);
+    background: color-mix(in oklch, var(--surface) 88%, transparent); backdrop-filter: blur(6px);
+    color: var(--data-label); font-size: 18px; cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: all .15s;
+  }
+  .nav-arrow:hover { color: var(--foreground); border-color: var(--accent-primary); }
+  .nav-arrow:disabled { opacity: 0.25; pointer-events: none; }
+  .nav-arrow.prev { left: 22px; }
+  .nav-arrow.next { right: 22px; }
+
+  .dots { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); z-index: 90; display: flex; gap: 9px; align-items: center; }
+  .dots button {
+    width: 8px; height: 8px; border-radius: 50%; border: none; background: var(--border-soft); cursor: pointer; padding: 0;
+    transition: all .2s;
+  }
+  .dots button.active { background: var(--accent-primary); width: 22px; border-radius: 5px; }
+  .dots button:hover:not(.active) { background: var(--data-label); }
+
+  @media (max-width: 720px) {
+    .slide { padding: 84px 22px 80px; }
+    .nav-arrow { width: 38px; height: 38px; }
+  }
+
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--data-label); text-decoration: none; border: 1px solid var(--border-subtle); border-radius: 999px; padding: 6px 12px; transition: color .15s ease, border-color .15s ease; }
+  .back-link:hover { color: var(--foreground); border-color: var(--accent-primary); }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><span class="dot"></span>Roomwise <span class="sub">SIMULATOR</span></div>
+  <div class="top-right">
+    <a class="back-link" href="index.html">← Home</a>
+    <a class="back-link" href="pitch.html">Pitch deck →</a>
+    <button class="icon-btn" id="themeBtn" title="Toggle light/dark">🌙</button>
+  </div>
+</div>
+
+<div class="deck">
+  <section class="slide active" data-fullbleed="1" data-noscroll="1">
+    <div class="slide-inner" style="height:100%;">
+      <div class="dash-head">
+        <h2 class="section-title" style="margin-bottom:6px;">Live dashboard — rooms of Ringvägen 98</h2>
+        <p class="section-lede" style="margin-bottom:14px;">Same rules as production. Drag a signal. Flip one to <span class="tier-label-3">DOWN</span> — or kill them all: it still answers, safely, and says why.</p>
+        <div class="presets" id="presets"></div>
+      </div>
+
+      <div class="dash-grid">
+        <div class="dash-col">
+          <div class="panel">
+            <div class="panel-title">Room profile</div>
+            <div class="room-select" id="roomSelect"></div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-title">Mode</div>
+            <div class="mode-row">
+              <span class="lbl" id="modeLabel">AI-recommended</span>
+              <button class="switch" id="modeSwitch"><span class="knob"></span></button>
+            </div>
+            <div id="overrideRow" style="display:none" class="override-input">
+              <input type="number" step="0.1" id="overrideInput" />
+              <span>°C manual setpoint</span>
+            </div>
+          </div>
+
+          <div class="panel panel-grow">
+            <div class="panel-title">Signals — value · tier · weight <span style="font-weight:normal;text-transform:none;">↕ scroll</span></div>
+            <div id="signalRows"></div>
+          </div>
+        </div>
+
+        <div class="dash-col">
+          <div class="output-card">
+            <div class="output-badge" id="engineBadge">🧠 Reasoning</div>
+            <div class="big-num" id="bigNum">14.0<small>°C</small></div>
+            <div class="big-label">Recommended Setback</div>
+            <div class="delta-note" id="deltaNote"></div>
+
+            <div class="conf-bar-wrap">
+              <div class="top"><span>Confidence</span><span id="confPct">—</span></div>
+              <div class="conf-track"><div class="conf-fill" id="confFill" style="width:0%"></div></div>
+            </div>
+
+            <div class="metric-grid">
+              <div class="metric-tile"><div class="l">Recovery time</div><div class="v" id="recoveryVal">—</div></div>
+              <div class="metric-tile"><div class="l">Savings vs. flat</div><div class="v" id="savingsVal">—</div></div>
+            </div>
+
+            <div class="narrative-box" id="narrativeBox">—</div>
+
+            <div class="trace-title">Reasoning trace</div>
+            <div class="trace-list" id="traceList"></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+    // ================= theme =================
+  var THEME_KEY = "roomwise-pitch-theme";
+  var themeBtn = document.getElementById("themeBtn");
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    themeBtn.textContent = t === "light" ? "☀️" : "🌙";
+  }
+  (function initTheme() {
+    var stored = null;
+    try { stored = localStorage.getItem(THEME_KEY); } catch (e) {}
+    applyTheme(stored === "light" ? "light" : "dark");
+  })();
+  themeBtn.onclick = function () {
+    var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  };
+
+    // ================= simulator (same rules as production optimizer) =================
+  var MIN_SETBACK = 13.5, MAX_SETBACK = 20, FLAT_BASELINE = 16, COMFORT_TEMP = 21, UNOCC_HOURS = 20;
+
+  var ROOMS = {
+    exec: { label: "302 · South corner", detail: "floor 6 · sun-heated · 3.1 W/K·m²", baselineC: 14.7, uaDensity: 3.1, uaTotal: 93, confidence: 0.9 },
+    standard: { label: "318 · North side", detail: "floor 4 · shaded · 2.0 W/K·m²", baselineC: 15.8, uaDensity: 2.0, uaTotal: 60, confidence: 0.85 },
+    penthouse: { label: "801 · Top floor", detail: "roof load · 3.6 W/K·m²", baselineC: 14.0, uaDensity: 3.6, uaTotal: 108, confidence: 0.8 },
+  };
+
+  var SIGNAL_DEFS = [
+    { id: "weather.outdoor_temp", label: "Outdoor temperature", unit: "°C", min: -15, max: 35, step: 0.5, def: 8 },
+    { id: "weather.cloud_cover", label: "Cloud cover", unit: "%", min: 0, max: 100, step: 1, def: 45 },
+    { id: "solar.irradiance", label: "Live solar irradiance", unit: "W/m²", min: 0, max: 1000, step: 10, def: 250 },
+    { id: "occupancy.hours_to_checkin", label: "Hours to next check-in", unit: "h", min: 0, max: 48, step: 0.5, def: 10 },
+    { id: "room_learning.recovery_rate", label: "Room learnings: recovery rate", unit: "min/°C", min: 5, max: 35, step: 0.5, def: 15 },
+    { id: "sensor.room_temperature", label: "Room sensor: actual vs. target", unit: "°C from target", min: -4, max: 4, step: 0.1, def: 0 },
+    { id: "feedback.guest_sentiment", label: "Guest/staff feedback", unit: "net score", min: -1, max: 1, step: 0.05, def: 0 },
+  ];
+
+  function clamp(v, lo, hi) { return Math.min(hi, Math.max(lo, v)); }
+
+  var state = { room: "exec", mode: "ai", overrideC: null, signals: {} };
+  SIGNAL_DEFS.forEach(function (s) { state.signals[s.id] = { value: s.def, tier: 1, weight: 1 }; });
+
+  function judge(id, v) {
+    switch (id) {
+      case "weather.outdoor_temp": {
+        var d = clamp((5 - v) * 0.03, -0.5, 0.8);
+        return { d: d, r: d > 0.05 ? "Cold outside (" + v.toFixed(1) + "°C) — losses run faster, keep a slightly warmer margin." : d < -0.05 ? "Mild outside (" + v.toFixed(1) + "°C) — a cooler setback still recovers comfortably." : "Outdoor temperature is close to neutral for this room." };
+      }
+      case "weather.cloud_cover": {
+        var d2 = clamp((v / 100 - 0.5) * 0.8, -0.4, 0.4);
+        return { d: d2, r: d2 < -0.05 ? "Low cloud cover (" + Math.round(v) + "%) — expect free solar heat." : d2 > 0.05 ? "Overcast (" + Math.round(v) + "%) — don't count on solar gain today." : "Cloud cover is roughly average." };
+      }
+      case "solar.irradiance": {
+        var d3 = clamp(-v / 2000, -0.6, 0);
+        return { d: d3, r: d3 < -0.05 ? "Strong live irradiance (" + Math.round(v) + " W/m²) beyond the static model — room to go cooler." : "Live irradiance is in line with the static model." };
+      }
+      case "occupancy.hours_to_checkin": {
+        var d4 = clamp(1.2 - v * 0.15, -0.6, 1.0);
+        return { d: d4, r: d4 > 0.1 ? "Check-in in " + v.toFixed(1) + " h — stay close to comfort to guarantee recovery in time." : "Check-in in " + v.toFixed(1) + " h — plenty of runway for a deeper setback." };
+      }
+      case "room_learning.recovery_rate": {
+        var d5 = clamp((v - 15) * 0.04, -0.5, 0.9);
+        return { d: d5, r: d5 > 0.05 ? "Slow to recover (" + v.toFixed(1) + " min/°C) — needs a warmer safety margin." : "Recovers quickly (" + v.toFixed(1) + " min/°C) — tolerates a deeper setback." };
+      }
+      case "sensor.room_temperature": {
+        var d6 = clamp(-v * 0.5, -0.8, 0.8);
+        return { d: d6, r: d6 > 0.05 ? "Sensor reads " + Math.abs(v).toFixed(1) + "°C colder than target — give recovery more margin." : d6 < -0.05 ? "Sensor reads " + Math.abs(v).toFixed(1) + "°C warmer than target — tracking ahead, room to go deeper." : "Sensor is tracking the target closely." };
+      }
+      case "feedback.guest_sentiment": {
+        var d7 = clamp(v * 0.9, -0.9, 0.9);
+        return { d: d7, r: d7 > 0.1 ? "Recent reports lean 'too cold' — recovering guests colder than they expect." : d7 < -0.1 ? "Recent reports lean 'too warm' — safe to run the setback deeper." : "Recent reports are mixed or neutral." };
+      }
+    }
+    return { d: 0, r: "No rule defined." };
+  }
+
+  function tierConfidence(base, tier) {
+    if (tier === 1) return base;
+    if (tier === 2) return base * 0.75;
+    return 0;
+  }
+
+  function compute() {
+    var room = ROOMS[state.room];
+    var rows = [];
+    var nudge = 0;
+    var wsum = 0, wconf = 0;
+
+    SIGNAL_DEFS.forEach(function (def) {
+      var sig = state.signals[def.id];
+      var tier = sig.tier;
+      var j = tier === 3 ? { d: 0, r: "Unavailable — no adjustment applied, excluded from the blend." } : judge(def.id, sig.value);
+      var confidence = tierConfidence(0.8, tier);
+      var contribution = tier === 3 ? 0 : sig.weight * j.d;
+      nudge += contribution;
+      if (tier !== 3) { wsum += sig.weight; wconf += sig.weight * confidence; }
+      rows.push({ def: def, sig: sig, judgment: j, contribution: contribution, confidence: confidence });
+    });
+
+    var aiSetback = Math.round(clamp(room.baselineC + nudge, MIN_SETBACK, MAX_SETBACK) * 10) / 10;
+    var isOverride = state.mode === "override" && state.overrideC != null;
+    var finalC = isOverride ? clamp(state.overrideC, MIN_SETBACK, MAX_SETBACK) : aiSetback;
+
+    var outdoorSig = state.signals["weather.outdoor_temp"];
+    var outdoorC = outdoorSig.tier !== 3 ? outdoorSig.value : 8;
+    var outdoorFactor = clamp(1 + Math.max(0, 10 - outdoorC) * 0.015, 1, 1.6);
+    var recoveryRate = state.signals["room_learning.recovery_rate"].tier !== 3 ? state.signals["room_learning.recovery_rate"].value : 15;
+    var recoveryMinutes = Math.round(Math.abs(COMFORT_TEMP - finalC) * recoveryRate * outdoorFactor);
+
+    var energyPerDegKwh = (room.uaTotal * UNOCC_HOURS) / 1000;
+    var savingsKwh = Math.round(energyPerDegKwh * (FLAT_BASELINE - finalC) * 10) / 10;
+    var flatEnergy = energyPerDegKwh * Math.max(COMFORT_TEMP - FLAT_BASELINE, 1);
+    var savingsPct = Math.round(clamp((savingsKwh / flatEnergy) * 100, -75, 75));
+
+    var signalConfidence = wsum > 0 ? wconf / wsum : 0.5;
+    var confidence = isOverride ? 1 : Math.round(clamp(room.confidence * 0.6 + signalConfidence * 0.4, 0.3, 0.99) * 100) / 100;
+
+    var activeCount = rows.filter(function (r) { return r.sig.tier !== 3 && Math.abs(r.judgment.d) > 0.03; }).length;
+    var narrative = isOverride
+      ? "Manual override — AI recommendation was " + aiSetback + "°C."
+      : activeCount
+        ? "Simulated reasoning: " + activeCount + " signal" + (activeCount === 1 ? "" : "s") + " moved the setpoint " + (nudge >= 0 ? "+" : "") + nudge.toFixed(2) + "°C off the " + room.label.toLowerCase() + " physics baseline. Same rule-based formulas as the production fallback reasoner."
+        : "Simulated reasoning: no live signal pushed materially off the physics baseline.";
+
+    return { room: room, rows: rows, aiSetback: aiSetback, finalC: finalC, isOverride: isOverride, recoveryMinutes: recoveryMinutes, savingsKwh: savingsKwh, savingsPct: savingsPct, confidence: confidence, narrative: narrative };
+  }
+
+  var PRESETS = [
+    { label: "🌤 Perfect data", apply: function () {
+      setAll({ "weather.outdoor_temp": 8, "weather.cloud_cover": 40, "solar.irradiance": 250, "occupancy.hours_to_checkin": 10, "room_learning.recovery_rate": 14, "sensor.room_temperature": 0, "feedback.guest_sentiment": 0 }, 1);
+    } },
+    { label: "☀️ Sunny & efficient", apply: function () {
+      setAll({ "weather.outdoor_temp": 22, "weather.cloud_cover": 8, "solar.irradiance": 780, "occupancy.hours_to_checkin": 18, "room_learning.recovery_rate": 11, "sensor.room_temperature": 0.4, "feedback.guest_sentiment": -0.4 }, 1);
+    } },
+    { label: "🥶 Cold snap, check-in soon", apply: function () {
+      setAll({ "weather.outdoor_temp": -6, "weather.cloud_cover": 85, "solar.irradiance": 40, "occupancy.hours_to_checkin": 1.5, "room_learning.recovery_rate": 24, "sensor.room_temperature": -1.6, "feedback.guest_sentiment": 0 }, 1);
+    } },
+    { label: "😡 Guest complained cold", apply: function () {
+      setAll({ "weather.outdoor_temp": 4, "weather.cloud_cover": 60, "solar.irradiance": 120, "occupancy.hours_to_checkin": 5, "room_learning.recovery_rate": 20, "sensor.room_temperature": -1.9, "feedback.guest_sentiment": 1 }, 1);
+    } },
+    { label: "📡 Sensors down", apply: function () {
+      Object.keys(state.signals).forEach(function (id) { state.signals[id].tier = 3; });
+      renderDash();
+    }, danger: true },
+  ];
+
+  function setAll(values, tier) {
+    Object.keys(values).forEach(function (id) {
+      state.signals[id].value = values[id];
+      state.signals[id].tier = tier;
+    });
+    renderDash();
+  }
+
+  var presetsEl = document.getElementById("presets");
+  PRESETS.forEach(function (p) {
+    var btn = document.createElement("button");
+    btn.className = "preset-btn" + (p.danger ? " danger" : "");
+    btn.textContent = p.label;
+    btn.onclick = p.apply;
+    presetsEl.appendChild(btn);
+  });
+
+  var roomSelectEl = document.getElementById("roomSelect");
+  Object.keys(ROOMS).forEach(function (key) {
+    var room = ROOMS[key];
+    var el = document.createElement("div");
+    el.className = "room-opt" + (state.room === key ? " active" : "");
+    el.dataset.key = key;
+    el.innerHTML = '<div class="n">' + room.label + '</div><div class="d">' + room.detail + "</div>";
+    el.onclick = function () { state.room = key; renderDash(); };
+    roomSelectEl.appendChild(el);
+  });
+
+  var modeSwitch = document.getElementById("modeSwitch");
+  var overrideInput = document.getElementById("overrideInput");
+  modeSwitch.onclick = function () {
+    state.mode = state.mode === "ai" ? "override" : "ai";
+    if (state.mode === "override" && state.overrideC == null) state.overrideC = compute().aiSetback;
+    renderDash();
+  };
+  overrideInput.oninput = function () {
+    var v = Number(overrideInput.value);
+    if (Number.isFinite(v)) { state.overrideC = v; renderDash(); }
+  };
+
+  var signalRowsEl = document.getElementById("signalRows");
+  var rowEls = {};
+  SIGNAL_DEFS.forEach(function (def) {
+    var row = document.createElement("div");
+    row.className = "signal-row";
+    row.innerHTML =
+      '<div class="head"><span class="name">' + def.label + '</span><span class="val" data-val></span></div>' +
+      '<div class="tier-toggle" data-tier></div>' +
+      '<input type="range" data-value-slider min="' + def.min + '" max="' + def.max + '" step="' + def.step + '" value="' + def.def + '" />' +
+      '<div class="row-footer"><span data-rationale style="flex:1;padding-right:8px;"></span></div>' +
+      '<div class="weight-line"><span>weight</span><input type="range" class="weight-slider" data-weight-slider min="0" max="2" step="0.1" value="1" /><span data-weight-val style="font-family:var(--font-mono);font-size:9.5px;color:var(--foreground);width:32px;text-align:right;"></span></div>';
+    signalRowsEl.appendChild(row);
+
+    var tierWrap = row.querySelector("[data-tier]");
+    [1, 2, 3].forEach(function (t) {
+      var b = document.createElement("button");
+      b.className = "tier-btn";
+      b.textContent = t === 1 ? "LIVE" : t === 2 ? "STALE" : "DOWN";
+      b.onclick = function () { state.signals[def.id].tier = t; renderDash(); };
+      tierWrap.appendChild(b);
+    });
+
+    var valueSlider = row.querySelector("[data-value-slider]");
+    valueSlider.oninput = function () { state.signals[def.id].value = Number(valueSlider.value); renderDash(); };
+    var weightSlider = row.querySelector("[data-weight-slider]");
+    weightSlider.oninput = function () { state.signals[def.id].weight = Number(weightSlider.value); renderDash(); };
+
+    rowEls[def.id] = row;
+  });
+
+  var traceListEl = document.getElementById("traceList");
+
+  function fmtSigned(n, digits) {
+    var s = n.toFixed(digits == null ? 2 : digits);
+    return (n >= 0 ? "+" : "") + s;
+  }
+
+  function renderDash() {
+    var result = compute();
+
+    roomSelectEl.querySelectorAll(".room-opt").forEach(function (el) {
+      el.classList.toggle("active", el.dataset.key === state.room);
+    });
+
+    document.getElementById("modeLabel").textContent = state.mode === "ai" ? "AI-recommended" : "Manual override";
+    modeSwitch.classList.toggle("on", state.mode === "override");
+    document.getElementById("overrideRow").style.display = state.mode === "override" ? "flex" : "none";
+    if (state.mode === "override" && overrideInput.value === "") overrideInput.value = String(state.overrideC != null ? state.overrideC : result.aiSetback);
+
+    SIGNAL_DEFS.forEach(function (def) {
+      var sig = state.signals[def.id];
+      var row = rowEls[def.id];
+      row.querySelector("[data-val]").textContent = (sig.tier === 3 ? "N/A" : sig.value.toFixed(1) + " " + def.unit);
+      row.querySelectorAll("[data-tier] .tier-btn").forEach(function (b, i) {
+        b.classList.toggle("active-" + (i + 1), sig.tier === i + 1);
+      });
+      row.querySelector("[data-value-slider]").value = sig.value;
+      row.querySelector("[data-value-slider]").disabled = sig.tier === 3;
+      row.querySelector("[data-value-slider]").style.opacity = sig.tier === 3 ? 0.35 : 1;
+      var found = result.rows.filter(function (r) { return r.def.id === def.id; })[0];
+      row.querySelector("[data-rationale]").textContent = found ? found.judgment.r : "";
+      row.querySelector("[data-weight-slider]").value = sig.weight;
+      row.querySelector("[data-weight-val]").textContent = sig.weight.toFixed(1) + "×";
+    });
+
+    document.getElementById("engineBadge").innerHTML = result.isOverride ? "✍️ Manual override" : "🧠 Simulated reasoning";
+    document.getElementById("bigNum").innerHTML = result.finalC.toFixed(1) + "<small>°C</small>";
+    var delta = result.finalC - result.room.baselineC;
+    document.getElementById("deltaNote").textContent = Math.abs(delta) > 0.05
+      ? "Physics baseline " + result.room.baselineC + "°C · signals moved it " + fmtSigned(delta, 1) + "°C"
+      : "Matches the physics baseline.";
+
+    var confPct = Math.round(result.confidence * 100);
+    document.getElementById("confPct").textContent = confPct + "%";
+    var fill = document.getElementById("confFill");
+    fill.style.width = confPct + "%";
+    fill.style.background = confPct >= 80 ? "var(--accent-success)" : confPct >= 60 ? "var(--accent-primary)" : "var(--accent-warn)";
+
+    document.getElementById("recoveryVal").textContent = result.recoveryMinutes + " min";
+    document.getElementById("savingsVal").textContent = (result.savingsKwh >= 0 ? "" : "−") + Math.abs(result.savingsKwh).toFixed(1) + " kWh/d (" + result.savingsPct + "%)";
+    document.getElementById("narrativeBox").textContent = result.narrative;
+
+    traceListEl.innerHTML = "";
+    var baseRow = document.createElement("div");
+    baseRow.className = "trace-row";
+    baseRow.innerHTML = '<div class="h"><span class="name">Physics · ' + result.room.label + '</span><span>' + result.room.baselineC + '°C baseline</span></div><div class="rationale">UA density ' + result.room.uaDensity.toFixed(1) + ' W/K·m² · confidence ' + Math.round(result.room.confidence * 100) + '%. Never weighted — signals only nudge around it.</div>';
+    traceListEl.appendChild(baseRow);
+
+    result.rows.forEach(function (r) {
+      var el = document.createElement("div");
+      el.className = "trace-row";
+      var tierClass = "tier-label-" + r.sig.tier;
+      var valTxt = r.sig.tier === 3 ? "N/A" : r.sig.value.toFixed(1) + " " + r.def.unit;
+      el.innerHTML =
+        '<div class="h"><span class="name">' + r.def.label + ' <span class="' + tierClass + '">TIER ' + r.sig.tier + '</span></span><span>' + valTxt + '</span></div>' +
+        '<div class="rationale">' + r.judgment.r + '</div>' +
+        '<div class="contrib">weight ' + r.sig.weight.toFixed(1) + '× · direction ' + fmtSigned(r.sig.tier === 3 ? 0 : r.judgment.d) + '°C · contributes ' + fmtSigned(r.contribution) + '°C</div>';
+      traceListEl.appendChild(el);
+    });
+  }
+
+  renderDash();
+})();
+</script>
+</body>
+</html>
