@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Roomwise</title>
-<meta name="description" content="Roomwise sets the heating in each empty hotel room on its own terms, and keeps a written account of why. Pitch deck and live simulator." />
+<title>RoomSense</title>
+<meta name="description" content="RoomSense sets a different heating setback for each empty hotel room and explains the reasoning behind it. Pitch deck and live simulator." />
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌡️</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -61,9 +61,11 @@
     pointer-events: none;
   }
   .topbar > * { pointer-events: auto; }
-  .brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 15px; }
-  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary); box-shadow: 0 0 10px var(--accent-primary); }
-  .brand .sub { font-family: var(--font-mono); font-size: 9px; color: var(--data-label); letter-spacing: 0.08em; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 2px 6px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; }
+  .brand img { width: 22px; height: 22px; display: block; }
+  .brand .r { font-weight: 700; background: linear-gradient(135deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand .oom { font-weight: 500; color: var(--foreground); }
+  .brand .sense { font-weight: 700; background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .top-right { display: flex; align-items: center; gap: 10px; }
   .slide-counter { font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); }
   .icon-btn {
@@ -363,34 +365,76 @@
   .landing-head .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--data-label); margin-bottom: 14px; }
   .landing-head h1 { font-family: var(--font-display); font-size: clamp(30px, 4.5vw, 44px); font-weight: 700; margin: 0 0 12px; letter-spacing: -0.01em; }
   .landing-head p { font-size: 16px; color: var(--data-label); max-width: 560px; margin: 0 auto; line-height: 1.5; }
-  .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
-  @media (max-width: 640px) { .card-grid { grid-template-columns: 1fr; } }
-  .app-card {
-    display: block; text-decoration: none; color: inherit;
-    background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 18px;
-    padding: 32px 26px; transition: border-color .18s ease, transform .18s ease, background .18s ease;
+  .card-grid {
+    display: grid; grid-template-columns: 1fr 1fr; gap: 44px;
+    max-width: 620px; margin: 0 auto; perspective: 1400px;
   }
-  .app-card:hover { border-color: var(--accent-primary); transform: translateY(-3px); background: var(--surface-2); }
-  .app-card .icon {
-    width: 52px; height: 52px; border-radius: 14px; display: flex; align-items: center; justify-content: center;
-    font-size: 26px; margin-bottom: 18px;
-    background: color-mix(in oklch, var(--accent-primary) 16%, var(--surface)); border: 1px solid color-mix(in oklch, var(--accent-primary) 30%, var(--border-subtle));
+  @media (max-width: 640px) { .card-grid { grid-template-columns: 1fr; gap: 28px; max-width: 300px; } }
+  .app-card {
+    position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
+    text-decoration: none; color: inherit;
+    background: linear-gradient(180deg, var(--surface-2), var(--surface));
+    border: 1px solid var(--border-soft); border-bottom: none; border-radius: 7px 7px 0 0;
+    padding: 36px 34px 24px; min-height: 400px;
+    transform-origin: 0% 50%;
+    transition: transform .45s cubic-bezier(.2,.7,.25,1), border-color .2s ease, box-shadow .45s ease;
+  }
+  .app-card::before {
+    content: ""; position: absolute; inset: 13px 13px 0; pointer-events: none;
+    border: 1px solid var(--border-subtle); border-bottom: none; border-radius: 4px 4px 0 0; opacity: .8;
+  }
+  .app-card:hover {
+    transform: rotateY(-9deg); border-color: var(--accent-primary);
+    box-shadow: 22px 14px 38px color-mix(in oklch, var(--bg-deep) 40%, oklch(0 0 0 / .35));
+  }
+  .app-card .peep {
+    width: 11px; height: 11px; border-radius: 50%; margin-bottom: 20px;
+    background: radial-gradient(circle at 35% 35%, var(--border-soft), var(--bg-deep) 70%);
+    border: 2px solid var(--border-soft);
   }
   .app-card .plate {
-    font-family: var(--font-mono); font-size: 9.5px; letter-spacing: .12em; color: var(--data-label);
-    border: 1px solid var(--border-subtle); border-radius: 6px; padding: 3px 8px;
-    display: inline-block; margin-bottom: 12px; background: var(--bg-deep);
+    font-family: var(--font-mono); font-size: 13px; letter-spacing: .22em; color: var(--foreground);
+    border: 1px solid var(--border-soft); border-radius: 4px; padding: 5px 13px 5px 15px;
+    background: var(--bg-deep); margin-bottom: 20px;
   }
-  .app-card h2 { font-family: var(--font-display); font-size: 19px; font-weight: 600; margin: 0 0 8px; }
-  .app-card p { font-size: 13.5px; color: var(--data-label); line-height: 1.5; margin: 0 0 16px; }
-  .app-card .go { font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary); display: inline-flex; align-items: center; gap: 5px; }
-  .landing-foot { text-align: center; margin-top: 44px; font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); letter-spacing: .04em; }
+  .app-card h2 { font-family: var(--font-display); font-size: 18px; font-weight: 600; margin: 0 0 9px; }
+  .app-card p { font-size: 12.5px; color: var(--data-label); line-height: 1.6; margin: 0; max-width: 24ch; }
+  .app-card .handle {
+    position: absolute; right: 20px; top: 58%; width: 30px; height: 7px; border-radius: 999px;
+    background: var(--border-soft); box-shadow: 0 1px 2px oklch(0 0 0 / .3);
+  }
+  .app-card .reader {
+    position: absolute; right: 26px; top: calc(58% + 22px); width: 18px; height: 30px;
+    border: 1px solid var(--border-subtle); border-radius: 4px; background: var(--bg-deep);
+    display: flex; align-items: flex-end; justify-content: center; padding-bottom: 5px;
+  }
+  .app-card .reader .led { width: 4px; height: 4px; border-radius: 50%; background: var(--accent-danger); transition: all .2s; }
+  .app-card:hover .reader .led { background: var(--accent-success); box-shadow: 0 0 7px var(--accent-success); }
+  .app-card .go {
+    margin-top: auto; padding-top: 18px;
+    font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary);
+    display: inline-flex; align-items: center; gap: 5px;
+    opacity: .55; transition: opacity .2s;
+  }
+  .app-card:hover .go { opacity: 1; }
+  .corridor-floor {
+    max-width: 760px; margin: 0 auto; height: 12px;
+    border-top: 1px solid var(--border-soft);
+    background: linear-gradient(180deg, color-mix(in oklch, var(--foreground) 7%, transparent), transparent);
+  }
+  .landing-foot { text-align: center; margin-top: 40px; font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); letter-spacing: .04em; }
+  .credits { display: flex; justify-content: center; align-items: baseline; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+  .credits .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--data-label); opacity: .7; margin-right: 4px; }
+  .credits span:not(.lbl) {
+    font-family: var(--font-mono); font-size: 10px; color: var(--data-label);
+    border: 1px solid var(--border-subtle); border-radius: 999px; padding: 4px 11px;
+  }
 </style>
 </head>
 <body>
 
 <div class="topbar">
-  <div class="brand"><span class="dot"></span>Roomwise <span class="sub">ARENA D · ASSA ABLOY</span></div>
+  <div class="brand"><img src="assets/roomsense-logo.png" alt="" /><span><span class="r">R</span><span class="oom">oom</span><span class="sense">Sense</span></span></div>
   <div class="top-right">
     <button class="icon-btn" id="themeBtn" title="Toggle light/dark">🌙</button>
   </div>
@@ -398,29 +442,40 @@
 
 <div class="landing">
   <div class="landing-head">
-    <div class="kicker">Night audit · Ringvägen 98</div>
-    <h1>Room 204 holds its warmth.<br/>Room 117 never did.</h1>
-    <p>Empty rooms are not alike. Roomwise heats each one on its own terms, and writes down why.</p>
+    <div class="kicker">Ringvägen 98, Stockholm</div>
+    <h1>A different setback for every empty room,<br/>with the reasoning behind it.</h1>
+    <p>Most hotels heat every empty room to the same setpoint. RoomSense looks at each room's own sun exposure, shell and current conditions, and sets a different setpoint, with the reasoning shown.</p>
   </div>
 
   <div class="card-grid">
     <a class="app-card" href="simulator.html">
-      <div class="icon">🎛️</div>
-      <div class="plate">ROOM 101</div>
+      <span class="peep"></span>
+      <span class="plate">101</span>
       <h2>Simulator</h2>
-      <p>The decision engine on a workbench. Cut a feed and see what the room does about it.</p>
+      <p>The same logic RoomSense runs in production. Change a signal, or turn one off, and see how the recommendation and its reasoning change.</p>
+      <span class="handle"></span>
+      <span class="reader"><span class="led"></span></span>
       <span class="go">Unlock →</span>
     </a>
     <a class="app-card" href="pitch.html">
-      <div class="icon">🖥️</div>
-      <div class="plate">ROOM 102</div>
+      <span class="peep"></span>
+      <span class="plate">102</span>
       <h2>Pitch deck</h2>
-      <p>Why hotels heat empty rooms as if someone were in them. Five minutes, arrow keys.</p>
+      <p>The problem, how it works, and the numbers behind it. About five minutes, arrow keys to move through it.</p>
+      <span class="handle"></span>
+      <span class="reader"><span class="led"></span></span>
       <span class="go">Unlock →</span>
     </a>
   </div>
+  <div class="corridor-floor"></div>
 
-  <div class="landing-foot">Front desk · Ringvägen 98, Stockholm · Roomwise</div>
+  <div class="landing-foot">Ringvägen 98, Stockholm · RoomSense</div>
+  <div class="credits">
+    <span class="lbl">Built with</span>
+    <span>Claude</span>
+    <span>Lovable</span>
+    <span>Nebius</span>
+  </div>
 </div>
 
 <script>

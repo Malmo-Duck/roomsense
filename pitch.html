@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>Roomwise — The Room That Knows Itself</title>
+<title>RoomSense: Pitch Deck</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌡️</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
@@ -52,6 +52,19 @@
   a { color: inherit; }
   ::selection { background: color-mix(in oklch, var(--accent-primary) 35%, transparent); }
 
+  /* ---------- ambient glow ---------- */
+  body::before {
+    content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+    background:
+      radial-gradient(680px circle at 10% -10%, color-mix(in oklch, var(--accent-primary) 20%, transparent), transparent 60%),
+      radial-gradient(620px circle at 95% 105%, color-mix(in oklch, var(--accent-success) 14%, transparent), transparent 60%);
+  }
+  :root[data-theme="light"] body::before {
+    background:
+      radial-gradient(680px circle at 10% -10%, color-mix(in oklch, var(--accent-primary) 9%, transparent), transparent 60%),
+      radial-gradient(620px circle at 95% 105%, color-mix(in oklch, var(--accent-success) 7%, transparent), transparent 60%);
+  }
+
   /* ---------- chrome: topbar + nav ---------- */
   .topbar {
     position: fixed; top: 0; left: 0; right: 0; z-index: 100;
@@ -60,9 +73,12 @@
     pointer-events: none;
   }
   .topbar > * { pointer-events: auto; }
-  .brand { display: flex; align-items: center; gap: 9px; font-family: var(--font-display); font-weight: 700; font-size: 15px; }
-  .brand .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent-primary); box-shadow: 0 0 10px var(--accent-primary); }
-  .brand .sub { font-family: var(--font-mono); font-size: 9px; color: var(--data-label); letter-spacing: 0.08em; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 2px 6px; }
+  .brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; }
+  .brand img { width: 22px; height: 22px; display: block; }
+  .brand .r { font-weight: 700; background: linear-gradient(135deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand .oom { font-weight: 500; color: var(--foreground); }
+  .brand .sense { font-weight: 700; background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand .sub { font-family: var(--font-mono); font-size: 9px; color: var(--data-label); letter-spacing: 0.08em; border: 1px solid var(--border-subtle); border-radius: 4px; padding: 2px 6px; margin-left: 2px; }
   .top-right { display: flex; align-items: center; gap: 10px; }
   .slide-counter { font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); }
   .icon-btn {
@@ -97,7 +113,7 @@
   h2.section-title { font-family: var(--font-display); font-size: clamp(24px, 3vw, 32px); font-weight: 600; margin: 0 0 12px; letter-spacing: -0.01em; }
   p.section-lede { color: var(--data-label); font-size: 14.5px; line-height: 1.65; max-width: 68ch; margin: 0 0 28px; }
 
-  /* Terse fragment lists — no full sentences, one idea per line. */
+  /* Terse fragment lists: no full sentences, one idea per line. */
   .pt-list { list-style: none; margin: 0 0 26px; padding: 0; display: flex; flex-direction: column; gap: 9px; }
   .pt-list li { display: flex; align-items: baseline; gap: 10px; font-size: 14.5px; color: var(--data-label); line-height: 1.4; }
   .pt-list li::before { content: "—"; color: var(--accent-primary); font-family: var(--font-mono); flex-shrink: 0; }
@@ -416,7 +432,7 @@
 </svg>
 
 <div class="topbar">
-  <div class="brand"><span class="dot"></span>Roomwise <span class="sub">ARENA D · PITCH</span></div>
+  <div class="brand"><img src="assets/roomsense-logo.png" alt="" /><span><span class="r">R</span><span class="oom">oom</span><span class="sense">Sense</span></span> <span class="sub">PITCH</span></div>
   <div class="top-right">
     <span class="slide-counter" id="slideCounter">1 / 10</span>
     <button class="icon-btn" id="themeBtn" title="Toggle light/dark">🌙</button>
@@ -428,22 +444,22 @@
   <!-- 1: title -->
   <section class="slide active" data-slide="0">
     <div class="slide-inner">
-      <div class="kicker">Roomwise · Arena D · Assa Abloy · The Room That Knows Itself</div>
-      <h1 class="headline">Two rooms. Same night.<br/><span class="accent">Two different answers.</span></h1>
+      <div class="kicker">RoomSense · Assa Abloy · Ringvägen 98</div>
+      <h1 class="headline">One night. Two rooms.<br/><span class="accent">Two different setbacks.</span></h1>
       <div class="hook-rooms">
         <div class="hook-card south">
           <div class="tag">Room 302 · south corner · floor 6</div>
           <div class="temp">14.1<small>°C</small></div>
-          <div class="why">Empty until Thursday. Sun on its facade from 11:00 — it coasts deep and lets the sun reheat it.</div>
+          <div class="why">Empty until Thursday, direct sun on this facade from 11:00, so the setback can go deeper because the sun helps it recover.</div>
         </div>
         <div class="hook-vs">vs</div>
         <div class="hook-card north">
           <div class="tag">Room 318 · north side · floor 4</div>
           <div class="temp">15.2<small>°C</small></div>
-          <div class="why">Shaded by the neighbor all day. Less room to coast — it holds a warmer floor.</div>
+          <div class="why">Shaded by the neighboring building all day, so there's less help recovering, and the setback stays shallower.</div>
         </div>
       </div>
-      <p class="lede" style="margin-top:26px;">Both warm again before 15:00 check-in. A flat setback treats them the same.<br/><strong style="color:var(--foreground)">Roomwise doesn't — and it shows its math.</strong></p>
+      <p class="lede" style="margin-top:26px;">Both rooms are warm again before the 15:00 check-in. A flat, one-size setback would treat them the same.<br/><strong style="color:var(--foreground)">RoomSense calculates each one separately, and shows the reasoning.</strong></p>
     </div>
   </section>
 
@@ -454,7 +470,7 @@
         <h2 class="section-title">Why every hotel runs one flat setback</h2>
         <ul class="pt-list big">
           <li>Empty-room heating: a top opex + carbon line</li>
-          <li>Sun, floor, shading, bookings — all knowable, all ignored</li>
+          <li>Sun, floor, shading, bookings: all knowable, all ignored</li>
           <li>The real blocker is fear: <strong>one guest, one cold room</strong></li>
           <li>So setbacks stay shallow. Savings stay on the table</li>
         </ul>
@@ -475,7 +491,7 @@
   <section class="slide" data-slide="2">
     <div class="slide-inner">
       <h2 class="section-title">The building. Not a hypothetical.</h2>
-      <p class="section-lede" style="margin-bottom:20px;">Ringvägen 98, Stockholm — the reference property, as Roomwise sees it from public data alone.</p>
+      <p class="section-lede" style="margin-bottom:20px;">Ringvägen 98, Stockholm: the reference property, as RoomSense sees it from public data alone.</p>
       <div class="bldg-grid">
         <svg class="bldg-svg" viewBox="0 0 780 400" aria-label="Ringvägen 98 cross-section">
           <!-- ground -->
@@ -529,10 +545,10 @@
           <text x="640" y="345" font-family="var(--font-mono)" font-size="10" fill="var(--accent-warn)">south facade</text>
         </svg>
         <div class="src-list">
-          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>OSM Overpass</strong> — footprint, orientation, height, neighbor geometry</span></div>
-          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>PVGIS</strong> — facade irradiance today: south 3.4 kWh/m², north 0.9</span></div>
-          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>Open-Meteo</strong> — hourly temperature + cloud, 7-day forecast</span></div>
-          <div class="src-item syn"><span class="s">◐ SYNTH</span><span class="d"><strong>Room inventory</strong> — 90 rooms on floors 3–8, derived from the geometry</span></div>
+          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>OSM Overpass</strong>: footprint, orientation, height, neighbor geometry</span></div>
+          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>PVGIS</strong>: facade irradiance today: south 3.4 kWh/m², north 0.9</span></div>
+          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>Open-Meteo</strong>: hourly temperature + cloud, 7-day forecast</span></div>
+          <div class="src-item syn"><span class="s">◐ SYNTH</span><span class="d"><strong>Room inventory</strong>: 90 rooms on floors 3–8, derived from the geometry</span></div>
           <p style="font-size:12.5px;color:var(--data-label);line-height:1.6;margin:8px 2px 0;">Address in → geometry, sun, shading out.<br/><strong style="color:var(--foreground)">No hardware. No site visit.</strong></p>
         </div>
       </div>
@@ -580,18 +596,18 @@
       </div>
       <div class="formula-block" style="margin-top:26px;"><span class="k">setback</span> <span class="op">=</span> clamp( <span class="k">physicsBaseline</span> <span class="op">+</span> Σ ( <span class="k">managerWeight</span><sub>i</sub> <span class="op">×</span> <span class="k">aiDirection</span><sub>i</sub> ), MIN, MAX )</div>
       <ul class="pt-list" style="margin-bottom:0;">
-        <li><strong>Weight per signal</strong> — 0×–2×, per room. One slider</li>
-        <li><strong>Calibration offset</strong> — fix a known bias once, upstream</li>
-        <li><strong>Manual pin</strong> — AI never has the last word. Trace keeps computing</li>
+        <li><strong>Weight per signal</strong>: 0×–2×, per room. One slider</li>
+        <li><strong>Calibration offset</strong>: fix a known bias once, upstream</li>
+        <li><strong>Manual pin</strong>: AI never has the last word. Trace keeps computing</li>
       </ul>
     </div>
   </section>
 
-  <!-- 4: signals detail — what's real, what's mocked, what's next -->
+  <!-- 4: signals detail: what's real, what's mocked, what's next -->
   <section class="slide" data-slide="4">
     <div class="slide-inner">
       <h2 class="section-title">What's real. What's mocked. What's next.</h2>
-      <p class="section-lede" style="margin-bottom:20px;">Every signal is an adapter — same shape in, any provider underneath.</p>
+      <p class="section-lede" style="margin-bottom:20px;">Every signal is an adapter: same shape in, any provider underneath.</p>
       <div class="sig-cols">
         <div class="sig-col live">
           <div class="h">● Live today</div>
@@ -640,7 +656,7 @@
         <div class="flow-arrow">→</div>
         <div class="flow-card hi">
           <div class="tag">🧠 Reasoning</div>
-          <div class="line" style="margin-top:0;">"Cold outside — keep a warmer margin."<br/><br/><code style="font-family:var(--font-mono);font-size:10.5px;">clamp((5 − v) × 0.03, −0.5, 0.8)</code><br/>Same call, in words, by an LLM.</div>
+          <div class="line" style="margin-top:0;">"Cold outside: keep a warmer margin."<br/><br/><code style="font-family:var(--font-mono);font-size:10.5px;">clamp((5 − v) × 0.03, −0.5, 0.8)</code><br/>Same call, in words, by an LLM.</div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-card">
@@ -656,8 +672,8 @@
   <section class="slide" data-slide="6" data-fullbleed="1" data-noscroll="1">
     <div class="slide-inner">
       <div class="dash-head">
-        <h2 class="section-title" style="margin-bottom:6px;">Live dashboard — rooms of Ringvägen 98</h2>
-        <p class="section-lede" style="margin-bottom:14px;">Same rules as production. Drag a signal. Flip one to <span class="tier-label-3">DOWN</span> — or kill them all: it still answers, safely, and says why.</p>
+        <h2 class="section-title" style="margin-bottom:6px;">Live dashboard: rooms of Ringvägen 98</h2>
+        <p class="section-lede" style="margin-bottom:14px;">Same rules as production. Drag a signal, flip one to <span class="tier-label-3">DOWN</span>, or kill them all. It still answers, safely, and explains why.</p>
         <div class="presets" id="presets"></div>
       </div>
 
@@ -681,7 +697,7 @@
           </div>
 
           <div class="panel panel-grow">
-            <div class="panel-title">Signals — value · tier · weight <span style="font-weight:normal;text-transform:none;">↕ scroll</span></div>
+            <div class="panel-title">Signals: value · tier · weight <span style="font-weight:normal;text-transform:none;">↕ scroll</span></div>
             <div id="signalRows"></div>
           </div>
         </div>
@@ -757,7 +773,7 @@
         <div class="pitch-col">
           <div class="num">01 · End user</div>
           <h3>Ops &amp; engineering managers</h3>
-          <p>They own the cold-room complaint and the energy bill. Roomwise removes the trade-off between them.</p>
+          <p>They own the cold-room complaint and the energy bill. RoomSense removes the trade-off between them.</p>
         </div>
         <div class="pitch-col">
           <div class="num">02 · Deploys as</div>
@@ -784,7 +800,7 @@
       <h1>Every room already<br/>knows itself.</h1>
       <p style="font-size:22px;color:var(--foreground);">We taught it to speak.</p>
       <div class="thanks-tags">
-        <span>Roomwise · Ringvägen 98, today: 345 kWh not burned — every degree explained</span>
+        <span>RoomSense · Ringvägen 98, today: 345 kWh not burned, every degree explained</span>
       </div>
     </div>
   </section>
@@ -952,31 +968,31 @@
     switch (id) {
       case "weather.outdoor_temp": {
         var d = clamp((5 - v) * 0.03, -0.5, 0.8);
-        return { d: d, r: d > 0.05 ? "Cold outside (" + v.toFixed(1) + "°C) — losses run faster, keep a slightly warmer margin." : d < -0.05 ? "Mild outside (" + v.toFixed(1) + "°C) — a cooler setback still recovers comfortably." : "Outdoor temperature is close to neutral for this room." };
+        return { d: d, r: d > 0.05 ? "Cold outside (" + v.toFixed(1) + "°C): losses run faster, keep a slightly warmer margin." : d < -0.05 ? "Mild outside (" + v.toFixed(1) + "°C): a cooler setback still recovers comfortably." : "Outdoor temperature is close to neutral for this room." };
       }
       case "weather.cloud_cover": {
         var d2 = clamp((v / 100 - 0.5) * 0.8, -0.4, 0.4);
-        return { d: d2, r: d2 < -0.05 ? "Low cloud cover (" + Math.round(v) + "%) — expect free solar heat." : d2 > 0.05 ? "Overcast (" + Math.round(v) + "%) — don't count on solar gain today." : "Cloud cover is roughly average." };
+        return { d: d2, r: d2 < -0.05 ? "Low cloud cover (" + Math.round(v) + "%): expect free solar heat." : d2 > 0.05 ? "Overcast (" + Math.round(v) + "%): don't count on solar gain today." : "Cloud cover is roughly average." };
       }
       case "solar.irradiance": {
         var d3 = clamp(-v / 2000, -0.6, 0);
-        return { d: d3, r: d3 < -0.05 ? "Strong live irradiance (" + Math.round(v) + " W/m²) beyond the static model — room to go cooler." : "Live irradiance is in line with the static model." };
+        return { d: d3, r: d3 < -0.05 ? "Strong live irradiance (" + Math.round(v) + " W/m²) beyond the static model: room to go cooler." : "Live irradiance is in line with the static model." };
       }
       case "occupancy.hours_to_checkin": {
         var d4 = clamp(1.2 - v * 0.15, -0.6, 1.0);
-        return { d: d4, r: d4 > 0.1 ? "Check-in in " + v.toFixed(1) + " h — stay close to comfort to guarantee recovery in time." : "Check-in in " + v.toFixed(1) + " h — plenty of runway for a deeper setback." };
+        return { d: d4, r: d4 > 0.1 ? "Check-in in " + v.toFixed(1) + " h: stay close to comfort to guarantee recovery in time." : "Check-in in " + v.toFixed(1) + " h: plenty of runway for a deeper setback." };
       }
       case "room_learning.recovery_rate": {
         var d5 = clamp((v - 15) * 0.04, -0.5, 0.9);
-        return { d: d5, r: d5 > 0.05 ? "Slow to recover (" + v.toFixed(1) + " min/°C) — needs a warmer safety margin." : "Recovers quickly (" + v.toFixed(1) + " min/°C) — tolerates a deeper setback." };
+        return { d: d5, r: d5 > 0.05 ? "Slow to recover (" + v.toFixed(1) + " min/°C): needs a warmer safety margin." : "Recovers quickly (" + v.toFixed(1) + " min/°C): tolerates a deeper setback." };
       }
       case "sensor.room_temperature": {
         var d6 = clamp(-v * 0.5, -0.8, 0.8);
-        return { d: d6, r: d6 > 0.05 ? "Sensor reads " + Math.abs(v).toFixed(1) + "°C colder than target — give recovery more margin." : d6 < -0.05 ? "Sensor reads " + Math.abs(v).toFixed(1) + "°C warmer than target — tracking ahead, room to go deeper." : "Sensor is tracking the target closely." };
+        return { d: d6, r: d6 > 0.05 ? "Sensor reads " + Math.abs(v).toFixed(1) + "°C colder than target: give recovery more margin." : d6 < -0.05 ? "Sensor reads " + Math.abs(v).toFixed(1) + "°C warmer than target: tracking ahead, room to go deeper." : "Sensor is tracking the target closely." };
       }
       case "feedback.guest_sentiment": {
         var d7 = clamp(v * 0.9, -0.9, 0.9);
-        return { d: d7, r: d7 > 0.1 ? "Recent reports lean 'too cold' — recovering guests colder than they expect." : d7 < -0.1 ? "Recent reports lean 'too warm' — safe to run the setback deeper." : "Recent reports are mixed or neutral." };
+        return { d: d7, r: d7 > 0.1 ? "Recent reports lean 'too cold': recovering guests colder than they expect." : d7 < -0.1 ? "Recent reports lean 'too warm': safe to run the setback deeper." : "Recent reports are mixed or neutral." };
       }
     }
     return { d: 0, r: "No rule defined." };
@@ -997,7 +1013,7 @@
     SIGNAL_DEFS.forEach(function (def) {
       var sig = state.signals[def.id];
       var tier = sig.tier;
-      var j = tier === 3 ? { d: 0, r: "Unavailable — no adjustment applied, excluded from the blend." } : judge(def.id, sig.value);
+      var j = tier === 3 ? { d: 0, r: "Unavailable: no adjustment applied, excluded from the blend." } : judge(def.id, sig.value);
       var confidence = tierConfidence(0.8, tier);
       var contribution = tier === 3 ? 0 : sig.weight * j.d;
       nudge += contribution;
@@ -1025,7 +1041,7 @@
 
     var activeCount = rows.filter(function (r) { return r.sig.tier !== 3 && Math.abs(r.judgment.d) > 0.03; }).length;
     var narrative = isOverride
-      ? "Manual override — AI recommendation was " + aiSetback + "°C."
+      ? "Manual override: AI recommendation was " + aiSetback + "°C."
       : activeCount
         ? "Simulated reasoning: " + activeCount + " signal" + (activeCount === 1 ? "" : "s") + " moved the setpoint " + (nudge >= 0 ? "+" : "") + nudge.toFixed(2) + "°C off the " + room.label.toLowerCase() + " physics baseline. Same rule-based formulas as the production fallback reasoner."
         : "Simulated reasoning: no live signal pushed materially off the physics baseline.";
@@ -1177,7 +1193,7 @@
     traceListEl.innerHTML = "";
     var baseRow = document.createElement("div");
     baseRow.className = "trace-row";
-    baseRow.innerHTML = '<div class="h"><span class="name">Physics · ' + result.room.label + '</span><span>' + result.room.baselineC + '°C baseline</span></div><div class="rationale">UA density ' + result.room.uaDensity.toFixed(1) + ' W/K·m² · confidence ' + Math.round(result.room.confidence * 100) + '%. Never weighted — signals only nudge around it.</div>';
+    baseRow.innerHTML = '<div class="h"><span class="name">Physics · ' + result.room.label + '</span><span>' + result.room.baselineC + '°C baseline</span></div><div class="rationale">UA density ' + result.room.uaDensity.toFixed(1) + ' W/K·m² · confidence ' + Math.round(result.room.confidence * 100) + '%. Never weighted: signals only nudge around it.</div>';
     traceListEl.appendChild(baseRow);
 
     result.rows.forEach(function (r) {
