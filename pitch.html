@@ -444,8 +444,10 @@
   <!-- 1: title -->
   <section class="slide active" data-slide="0">
     <div class="slide-inner">
-      <div class="kicker">RoomSense · Assa Abloy · Ringvägen 98</div>
+      <div class="kicker">RoomSense · Assa Abloy</div>
       <h1 class="headline">One night. Two rooms.<br/><span class="accent">Two different setbacks.</span></h1>
+      <p class="lede">RoomSense takes one LiDAR scan of a hotel room and computes that room's own overnight heating setback, its recovery time, and its savings. Most hotels run one flat overnight temperature for every empty room, so rooms that could safely coast much colder never do. That's real energy and carbon savings across a whole property, with the reasoning behind every degree shown, not buried in a black box.</p>
+      <div style="font-family:var(--font-mono);font-size:10px;letter-spacing:0.1em;text-transform:uppercase;color:var(--data-label);margin:22px 0 10px;">Reference example · Ringvägen 98, Stockholm</div>
       <div class="hook-rooms">
         <div class="hook-card south">
           <div class="tag">Room 302 · south corner · floor 6</div>
@@ -459,7 +461,6 @@
           <div class="why">Shaded by the neighboring building all day, so there's less help recovering, and the setback stays shallower.</div>
         </div>
       </div>
-      <p class="lede" style="margin-top:26px;">Both rooms are warm again before the 15:00 check-in. A flat, one-size setback would treat them the same.<br/><strong style="color:var(--foreground)">RoomSense calculates each one separately, and shows the reasoning.</strong></p>
     </div>
   </section>
 
@@ -491,7 +492,7 @@
   <section class="slide" data-slide="2">
     <div class="slide-inner">
       <h2 class="section-title">The building. Not a hypothetical.</h2>
-      <p class="section-lede" style="margin-bottom:20px;">Ringvägen 98, Stockholm: the reference property, as RoomSense sees it from public data alone.</p>
+      <p class="section-lede" style="margin-bottom:20px;">Ringvägen 98, Stockholm: our reference example, as RoomSense sees it from public data alone.</p>
       <div class="bldg-grid">
         <svg class="bldg-svg" viewBox="0 0 780 400" aria-label="Ringvägen 98 cross-section">
           <!-- ground -->
@@ -672,7 +673,7 @@
   <section class="slide" data-slide="6" data-fullbleed="1" data-noscroll="1">
     <div class="slide-inner">
       <div class="dash-head">
-        <h2 class="section-title" style="margin-bottom:6px;">Live dashboard: rooms of Ringvägen 98</h2>
+        <h2 class="section-title" style="margin-bottom:6px;">Live dashboard: rooms of Ringvägen 98, our reference example</h2>
         <p class="section-lede" style="margin-bottom:14px;">Same rules as production. Drag a signal, flip one to <span class="tier-label-3">DOWN</span>, or kill them all. It still answers, safely, and explains why.</p>
         <div class="presets" id="presets"></div>
       </div>
@@ -733,10 +734,10 @@
   <section class="slide" data-slide="7">
     <div class="slide-inner">
       <h2 class="section-title">This building. Then every building.</h2>
-      <p class="section-lede" style="margin-bottom:20px;">Left: the per-room engine across Ringvägen 98's 90 rooms, vs a flat 16°C setback. Right: your portfolio.</p>
+      <p class="section-lede" style="margin-bottom:20px;">Left: the per-room engine across Ringvägen 98 (our reference example, 90 rooms), vs a flat 16°C setback. Right: your portfolio.</p>
       <div class="opp-grid">
         <div class="opp-outputs">
-          <div class="opp-card"><div class="tag">Ringvägen 98 · today</div><div class="big">345 <small>kWh not burned</small></div></div>
+          <div class="opp-card"><div class="tag">Ringvägen 98 · reference example</div><div class="big">345 <small>kWh not burned</small></div></div>
           <div class="opp-card"><div class="tag">Per year</div><div class="big">€31,500 <small>· 38 t CO₂</small></div></div>
           <div class="opp-note" style="margin-top:0;">90 rooms · avg 2.4°C deeper than flat, where each room allows it · same math as the dashboard.</div>
         </div>
@@ -800,7 +801,7 @@
       <h1>Every room already<br/>knows itself.</h1>
       <p style="font-size:22px;color:var(--foreground);">We taught it to speak.</p>
       <div class="thanks-tags">
-        <span>RoomSense · Ringvägen 98, today: 345 kWh not burned, every degree explained</span>
+        <span>RoomSense · Ringvägen 98 (reference example): 345 kWh not burned, every degree explained</span>
       </div>
     </div>
   </section>

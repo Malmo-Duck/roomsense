@@ -63,9 +63,9 @@
   .topbar > * { pointer-events: auto; }
   .brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; }
   .brand img { width: 22px; height: 22px; display: block; }
-  .brand .r { font-weight: 700; background: linear-gradient(135deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
-  .brand .oom { font-weight: 500; color: var(--foreground); }
-  .brand .sense { font-weight: 700; background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand .r, .hero-wordmark .r { font-weight: 700; background: linear-gradient(135deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand .oom, .hero-wordmark .oom { font-weight: 500; color: var(--foreground); }
+  .brand .sense, .hero-wordmark .sense { font-weight: 700; background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .top-right { display: flex; align-items: center; gap: 10px; }
   .slide-counter { font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); }
   .icon-btn {
@@ -359,23 +359,53 @@
     .nav-arrow { width: 38px; height: 38px; }
   }
 
-  body { overflow: auto; display: flex; align-items: center; justify-content: center; min-height: 100vh; }
-  .landing { max-width: 880px; width: 100%; padding: 100px 24px 64px; margin: 0 auto; }
-  .landing-head { text-align: center; margin-bottom: 48px; }
-  .landing-head .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--data-label); margin-bottom: 14px; }
-  .landing-head h1 { font-family: var(--font-display); font-size: clamp(30px, 4.5vw, 44px); font-weight: 700; margin: 0 0 12px; letter-spacing: -0.01em; }
-  .landing-head p { font-size: 16px; color: var(--data-label); max-width: 560px; margin: 0 auto; line-height: 1.5; }
-  .card-grid {
-    display: grid; grid-template-columns: 1fr 1fr; gap: 44px;
-    max-width: 620px; margin: 0 auto; perspective: 1400px;
+  html { height: 100%; }
+  body { height: 100dvh; overflow: hidden; }
+  .landing {
+    height: 100dvh; max-width: 900px; width: 100%; margin: 0 auto; box-sizing: border-box;
+    padding: clamp(64px, 10vh, 90px) 24px clamp(14px, 3vh, 28px);
+    display: flex; flex-direction: column; justify-content: center;
   }
-  @media (max-width: 640px) { .card-grid { grid-template-columns: 1fr; gap: 28px; max-width: 300px; } }
+  .landing-head { position: relative; text-align: center; margin-bottom: clamp(16px, 4vh, 44px); flex-shrink: 0; }
+  .hero-glow {
+    position: absolute; left: 50%; top: -14px; transform: translateX(-50%); z-index: 0;
+    width: clamp(180px, 26vh, 320px); height: clamp(180px, 26vh, 320px); border-radius: 50%; pointer-events: none;
+    background: color-mix(in oklch, var(--accent-primary) 16%, transparent); filter: blur(60px);
+  }
+  .hero-mark {
+    position: relative; width: clamp(40px, 7.5vh, 92px); height: clamp(40px, 7.5vh, 92px); margin: 0 auto clamp(8px, 2vh, 20px); display: block;
+    filter: drop-shadow(0 0 26px color-mix(in oklch, var(--accent-primary) 45%, transparent));
+  }
+  .hero-wordmark {
+    position: relative; display: flex; align-items: baseline; justify-content: center; gap: clamp(8px, 1.5vh, 12px);
+    font-family: var(--font-display); font-weight: 700; font-size: clamp(20px, 4.5vh, 40px); letter-spacing: -0.02em;
+  }
+  .hero-wordmark .rule { width: 1px; height: 0.75em; background: var(--border-soft); align-self: center; }
+  .hero-wordmark .version { font-family: var(--font-mono); font-size: clamp(10px, 1.6vh, 13px); font-weight: 500; letter-spacing: .05em; color: var(--data-label); }
+  .hero-tagline { position: relative; margin-top: clamp(4px, 1vh, 10px); font-family: var(--font-mono); font-size: clamp(8.5px, 1.3vh, 11px); letter-spacing: .28em; text-transform: uppercase; color: var(--data-label); }
+  .hero-pills { position: relative; display: flex; flex-wrap: wrap; justify-content: center; gap: clamp(6px, 1vh, 8px); margin-top: clamp(10px, 2.5vh, 26px); }
+  .hero-pills span, .hero-pills a {
+    display: inline-block; font-family: var(--font-mono); font-size: clamp(8.5px, 1.2vh, 10px); letter-spacing: .12em; text-transform: uppercase;
+    border-radius: 999px; padding: clamp(5px, 0.9vh, 7px) clamp(11px, 1.6vw, 15px); text-decoration: none; transition: all .15s;
+  }
+  .hero-pills .accent { color: var(--accent-primary); border: 1px solid color-mix(in oklch, var(--accent-primary) 30%, transparent); }
+  .hero-pills a { color: var(--data-label); border: 1px solid var(--border-subtle); }
+  .hero-pills a:hover { color: var(--foreground); border-color: color-mix(in oklch, var(--accent-primary) 40%, var(--border-subtle)); }
+  .landing-head h1 { position: relative; font-family: var(--font-display); font-size: clamp(32px, 5.5vw, 52px); font-weight: 600; margin: 32px 0 16px; letter-spacing: -0.02em; line-height: 1.08; }
+  .landing-head h1 .accent-text { color: var(--accent-primary); }
+  .landing-head p { position: relative; font-size: 15.5px; color: var(--data-label); max-width: 560px; margin: 0 auto; line-height: 1.6; }
+  .card-grid {
+    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(16px, 3vh, 36px);
+    max-width: 900px; margin: 0 auto; perspective: 1400px; flex-shrink: 0;
+  }
+  @media (max-width: 860px) { .card-grid { grid-template-columns: 1fr 1fr; max-width: 620px; } }
+  @media (max-width: 560px) { .card-grid { grid-template-columns: 1fr; gap: 28px; max-width: 300px; } }
   .app-card {
     position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
     text-decoration: none; color: inherit;
     background: linear-gradient(180deg, var(--surface-2), var(--surface));
-    border: 1px solid var(--border-soft); border-bottom: none; border-radius: 7px 7px 0 0;
-    padding: 36px 34px 24px; min-height: 400px;
+    border: 1px solid color-mix(in oklch, var(--accent-primary) 14%, var(--border-soft)); border-bottom: none; border-radius: 7px 7px 0 0;
+    padding: clamp(18px, 3vh, 36px) clamp(20px, 3vw, 34px) clamp(12px, 2vh, 24px); min-height: clamp(190px, 32vh, 400px);
     transform-origin: 0% 50%;
     transition: transform .45s cubic-bezier(.2,.7,.25,1), border-color .2s ease, box-shadow .45s ease;
   }
@@ -383,22 +413,27 @@
     content: ""; position: absolute; inset: 13px 13px 0; pointer-events: none;
     border: 1px solid var(--border-subtle); border-bottom: none; border-radius: 4px 4px 0 0; opacity: .8;
   }
+  .app-card::after {
+    content: ""; position: absolute; top: -1px; left: 22px; right: 22px; height: 3px; border-radius: 0 0 3px 3px;
+    background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); opacity: .75;
+  }
   .app-card:hover {
     transform: rotateY(-9deg); border-color: var(--accent-primary);
     box-shadow: 22px 14px 38px color-mix(in oklch, var(--bg-deep) 40%, oklch(0 0 0 / .35));
   }
   .app-card .peep {
-    width: 11px; height: 11px; border-radius: 50%; margin-bottom: 20px;
-    background: radial-gradient(circle at 35% 35%, var(--border-soft), var(--bg-deep) 70%);
-    border: 2px solid var(--border-soft);
+    width: 11px; height: 11px; border-radius: 50%; margin-bottom: clamp(8px, 2vh, 20px);
+    background: radial-gradient(circle at 35% 35%, color-mix(in oklch, var(--accent-primary) 45%, var(--border-soft)), var(--bg-deep) 70%);
+    border: 2px solid color-mix(in oklch, var(--accent-primary) 25%, var(--border-soft));
+    box-shadow: 0 0 10px color-mix(in oklch, var(--accent-primary) 20%, transparent);
   }
   .app-card .plate {
-    font-family: var(--font-mono); font-size: 13px; letter-spacing: .22em; color: var(--foreground);
-    border: 1px solid var(--border-soft); border-radius: 4px; padding: 5px 13px 5px 15px;
-    background: var(--bg-deep); margin-bottom: 20px;
+    font-family: var(--font-mono); font-size: clamp(11px, 1.7vh, 13px); letter-spacing: .22em; color: var(--accent-primary);
+    border: 1px solid color-mix(in oklch, var(--accent-primary) 35%, var(--border-soft)); border-radius: 4px; padding: clamp(3px, 0.7vh, 5px) 13px clamp(3px, 0.7vh, 5px) 15px;
+    background: var(--bg-deep); margin-bottom: clamp(8px, 2vh, 20px);
   }
-  .app-card h2 { font-family: var(--font-display); font-size: 18px; font-weight: 600; margin: 0 0 9px; }
-  .app-card p { font-size: 12.5px; color: var(--data-label); line-height: 1.6; margin: 0; max-width: 24ch; }
+  .app-card h2 { font-family: var(--font-display); font-size: clamp(14.5px, 2.2vh, 18px); font-weight: 600; margin: 0 0 clamp(4px, 1vh, 9px); }
+  .app-card p { font-size: clamp(10.5px, 1.6vh, 12.5px); color: var(--data-label); line-height: 1.5; margin: 0; max-width: 24ch; }
   .app-card .handle {
     position: absolute; right: 20px; top: 58%; width: 30px; height: 7px; border-radius: 999px;
     background: var(--border-soft); box-shadow: 0 1px 2px oklch(0 0 0 / .3);
@@ -411,19 +446,19 @@
   .app-card .reader .led { width: 4px; height: 4px; border-radius: 50%; background: var(--accent-danger); transition: all .2s; }
   .app-card:hover .reader .led { background: var(--accent-success); box-shadow: 0 0 7px var(--accent-success); }
   .app-card .go {
-    margin-top: auto; padding-top: 18px;
+    margin-top: auto; padding-top: clamp(8px, 1.6vh, 18px);
     font-family: var(--font-mono); font-size: 11px; color: var(--accent-primary);
     display: inline-flex; align-items: center; gap: 5px;
     opacity: .55; transition: opacity .2s;
   }
   .app-card:hover .go { opacity: 1; }
   .corridor-floor {
-    max-width: 760px; margin: 0 auto; height: 12px;
+    max-width: 760px; margin: 0 auto; height: 12px; flex-shrink: 0;
     border-top: 1px solid var(--border-soft);
     background: linear-gradient(180deg, color-mix(in oklch, var(--foreground) 7%, transparent), transparent);
   }
-  .landing-foot { text-align: center; margin-top: 40px; font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); letter-spacing: .04em; }
-  .credits { display: flex; justify-content: center; align-items: baseline; gap: 8px; margin-top: 22px; flex-wrap: wrap; }
+  .landing-foot { text-align: center; margin-top: clamp(12px, 2.5vh, 40px); font-family: var(--font-mono); font-size: 10.5px; color: var(--data-label); letter-spacing: .04em; flex-shrink: 0; }
+  .credits { display: flex; justify-content: center; align-items: baseline; gap: 8px; margin-top: clamp(6px, 1.5vh, 22px); flex-wrap: wrap; flex-shrink: 0; }
   .credits .lbl { font-family: var(--font-mono); font-size: 9px; letter-spacing: .14em; text-transform: uppercase; color: var(--data-label); opacity: .7; margin-right: 4px; }
   .credits span:not(.lbl) {
     font-family: var(--font-mono); font-size: 10px; color: var(--data-label);
@@ -442,26 +477,44 @@
 
 <div class="landing">
   <div class="landing-head">
-    <div class="kicker">Ringvägen 98, Stockholm</div>
-    <h1>A different setback for every empty room,<br/>with the reasoning behind it.</h1>
-    <p>Most hotels heat every empty room to the same setpoint. RoomSense looks at each room's own sun exposure, shell and current conditions, and sets a different setpoint, with the reasoning shown.</p>
+    <div class="hero-glow" aria-hidden="true"></div>
+    <img class="hero-mark" src="assets/roomsense-logo.png" alt="" />
+    <div class="hero-wordmark">
+      <span><span class="r">R</span><span class="oom">oom</span><span class="sense">Sense</span></span>
+      <span class="rule"></span>
+      <span class="version">v1.0</span>
+    </div>
+    <div class="hero-tagline">Room-level thermal intelligence</div>
+    <div class="hero-pills">
+      <span class="accent">Per-room energy optimization</span>
+      <a href="https://skanza.app" target="_blank" rel="noopener noreferrer">Powered by Skanza scans</a>
+    </div>
   </div>
 
   <div class="card-grid">
-    <a class="app-card" href="simulator.html">
+    <a class="app-card" href="https://lovable.dev/projects/ff6f4358-7a54-4a6a-a518-c1dba51c6d59" target="_blank" rel="noopener noreferrer">
+      <span class="peep"></span>
+      <span class="plate">100</span>
+      <h2>Prototype</h2>
+      <p>The working app. Upload a room's scan and get its setback, recovery time and savings, with a confidence score.</p>
+      <span class="handle"></span>
+      <span class="reader"><span class="led"></span></span>
+      <span class="go">Unlock ↗</span>
+    </a>
+    <a class="app-card" href="pitch.html">
       <span class="peep"></span>
       <span class="plate">101</span>
-      <h2>Simulator</h2>
-      <p>The same logic RoomSense runs in production. Change a signal, or turn one off, and see how the recommendation and its reasoning change.</p>
+      <h2>Pitch deck</h2>
+      <p>The problem, how it works, and the numbers behind it. About five minutes, arrow keys to move through it.</p>
       <span class="handle"></span>
       <span class="reader"><span class="led"></span></span>
       <span class="go">Unlock →</span>
     </a>
-    <a class="app-card" href="pitch.html">
+    <a class="app-card" href="simulator.html">
       <span class="peep"></span>
       <span class="plate">102</span>
-      <h2>Pitch deck</h2>
-      <p>The problem, how it works, and the numbers behind it. About five minutes, arrow keys to move through it.</p>
+      <h2>Simulator</h2>
+      <p>The same logic RoomSense runs in production. Change a signal, or turn one off, and see how the recommendation and its reasoning change.</p>
       <span class="handle"></span>
       <span class="reader"><span class="led"></span></span>
       <span class="go">Unlock →</span>
@@ -469,7 +522,7 @@
   </div>
   <div class="corridor-floor"></div>
 
-  <div class="landing-foot">Ringvägen 98, Stockholm · RoomSense</div>
+  <div class="landing-foot">Reference example: Ringvägen 98, Stockholm · RoomSense</div>
   <div class="credits">
     <span class="lbl">Built with</span>
     <span>Claude</span>
