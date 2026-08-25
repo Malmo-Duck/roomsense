@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>RoomSense: Movie Room</title>
+<meta name="description" content="A 30-second look at RoomSense." />
+<link rel="icon" type="image/png" href="assets/roomsense-logo.png">
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500;600&display=swap');
+
+  :root {
+    --bg-deep: oklch(0.08 0.004 265);
+    --surface: oklch(0.14 0.006 265);
+    --border-subtle: oklch(0.24 0.008 266);
+    --border-soft: oklch(0.30 0.01 266);
+    --accent-primary: oklch(0.62 0.19 260);
+    --accent-success: oklch(0.72 0.17 162);
+    --data-label: oklch(0.7 0.02 255);
+    --foreground: oklch(0.97 0.004 265);
+    --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-display: "Space Grotesk", "Inter", ui-sans-serif, system-ui, sans-serif;
+    --font-mono: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
+  }
+  :root[data-theme="light"] {
+    --bg-deep: oklch(0.99 0.002 265);
+    --surface: oklch(0.965 0.004 265);
+    --border-subtle: oklch(0.88 0.007 266);
+    --border-soft: oklch(0.8 0.008 266);
+    --accent-primary: oklch(0.52 0.19 260);
+    --accent-success: oklch(0.5 0.15 162);
+    --data-label: oklch(0.45 0.02 255);
+    --foreground: oklch(0.15 0.015 265);
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    background: var(--bg-deep); color: var(--foreground); font-family: var(--font-sans);
+    margin: 0; -webkit-font-smoothing: antialiased;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    min-height: 100vh; padding: 90px 24px 40px;
+  }
+  a { color: inherit; }
+
+  .topbar {
+    position: fixed; top: 0; left: 0; right: 0; z-index: 100;
+    display: flex; align-items: center; justify-content: space-between;
+    padding: 16px 24px;
+  }
+  .brand { display: flex; align-items: center; gap: 8px; font-family: var(--font-display); font-weight: 700; font-size: 15px; letter-spacing: -0.02em; }
+  .brand img { width: 22px; height: 22px; display: block; }
+  .brand .r { font-weight: 700; background: linear-gradient(135deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand .oom { font-weight: 500; color: var(--foreground); }
+  .brand .sense { font-weight: 700; background: linear-gradient(90deg, var(--accent-primary), var(--accent-success)); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .top-right { display: flex; align-items: center; gap: 10px; }
+  .back-link { display: inline-flex; align-items: center; gap: 6px; font-family: var(--font-mono); font-size: 11px; color: var(--data-label); text-decoration: none; border: 1px solid var(--border-subtle); border-radius: 999px; padding: 6px 12px; transition: color .15s ease, border-color .15s ease; }
+  .back-link:hover { color: var(--foreground); border-color: var(--accent-primary); }
+  .icon-btn {
+    width: 30px; height: 30px; border-radius: 8px; border: 1px solid var(--border-subtle); background: var(--surface);
+    color: var(--data-label); cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 14px;
+    transition: all .15s;
+  }
+  .icon-btn:hover { color: var(--foreground); border-color: var(--accent-primary); }
+
+  .wrap { max-width: 900px; width: 100%; text-align: center; }
+  .kicker { font-family: var(--font-mono); font-size: 11px; letter-spacing: .1em; text-transform: uppercase; color: var(--data-label); margin-bottom: 14px; }
+  h1 { font-family: var(--font-display); font-size: clamp(24px, 3.6vw, 34px); font-weight: 600; margin: 0 0 28px; letter-spacing: -0.01em; }
+
+  video {
+    width: 100%; display: block; border-radius: 14px; border: 1px solid var(--border-subtle);
+    background: var(--surface); box-shadow: 0 20px 60px oklch(0 0 0 / .35);
+  }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="brand"><img src="assets/roomsense-logo.png" alt="" /><span><span class="r">R</span><span class="oom">oom</span><span class="sense">Sense</span></span></div>
+  <div class="top-right">
+    <a class="back-link" href="index.html">← Home</a>
+    <button class="icon-btn" id="themeBtn" title="Toggle light/dark">🌙</button>
+  </div>
+</div>
+
+<div class="wrap">
+  <div class="kicker">No reading. 30 seconds.</div>
+  <h1>Just watch.</h1>
+  <video src="assets/roomsense-30s.mp4" controls playsinline preload="metadata"></video>
+</div>
+
+<script>
+(function () {
+  "use strict";
+  var THEME_KEY = "roomwise-pitch-theme";
+  var themeBtn = document.getElementById("themeBtn");
+  function applyTheme(t) {
+    document.documentElement.setAttribute("data-theme", t);
+    themeBtn.textContent = t === "light" ? "☀️" : "🌙";
+  }
+  (function initTheme() {
+    var stored = null;
+    try { stored = localStorage.getItem(THEME_KEY); } catch (e) {}
+    applyTheme(stored === "light" ? "light" : "dark");
+  })();
+  themeBtn.onclick = function () {
+    var next = document.documentElement.getAttribute("data-theme") === "light" ? "dark" : "light";
+    applyTheme(next);
+    try { localStorage.setItem(THEME_KEY, next); } catch (e) {}
+  };
+})();
+</script>
+</body>
+</html>

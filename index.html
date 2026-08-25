@@ -395,10 +395,10 @@
   .landing-head h1 .accent-text { color: var(--accent-primary); }
   .landing-head p { position: relative; font-size: 15.5px; color: var(--data-label); max-width: 560px; margin: 0 auto; line-height: 1.6; }
   .card-grid {
-    display: grid; grid-template-columns: 1fr 1fr 1fr; gap: clamp(16px, 3vh, 36px);
-    max-width: 900px; margin: 0 auto; perspective: 1400px; flex-shrink: 0;
+    display: grid; grid-template-columns: repeat(4, 1fr); gap: clamp(12px, 2.4vh, 28px);
+    max-width: 1080px; margin: 0 auto; perspective: 1400px; flex-shrink: 0;
   }
-  @media (max-width: 860px) { .card-grid { grid-template-columns: 1fr 1fr; max-width: 620px; } }
+  @media (max-width: 1000px) { .card-grid { grid-template-columns: 1fr 1fr; max-width: 620px; } }
   @media (max-width: 560px) { .card-grid { grid-template-columns: 1fr; gap: 28px; max-width: 300px; } }
   .app-card {
     position: relative; display: flex; flex-direction: column; align-items: center; text-align: center;
@@ -515,6 +515,15 @@
       <span class="plate">102</span>
       <h2>Simulator</h2>
       <p>The same logic RoomSense runs in production. Change a signal, or turn one off, and see how the recommendation and its reasoning change.</p>
+      <span class="handle"></span>
+      <span class="reader"><span class="led"></span></span>
+      <span class="go">Unlock →</span>
+    </a>
+    <a class="app-card" href="watch.html">
+      <span class="peep"></span>
+      <span class="plate">103</span>
+      <h2>Movie Room</h2>
+      <p>Don't want to read? 30 seconds, no reading required.</p>
       <span class="handle"></span>
       <span class="reader"><span class="led"></span></span>
       <span class="go">Unlock →</span>
