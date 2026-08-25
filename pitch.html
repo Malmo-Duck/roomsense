@@ -116,6 +116,33 @@
   .stat-chip .n { font-family: var(--font-mono); font-size: 21px; font-weight: 600; color: var(--foreground); }
   .stat-chip .l { font-size: 10.5px; color: var(--data-label); margin-top: 4px; }
 
+  /* ---------- title hook: two rooms ---------- */
+  .hook-rooms { display: grid; grid-template-columns: 1fr auto 1fr; gap: 16px; align-items: stretch; max-width: 860px; }
+  .hook-card { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 14px; padding: 20px 22px; }
+  .hook-card.south { border-color: color-mix(in oklch, var(--accent-warn) 45%, var(--border-subtle)); background: color-mix(in oklch, var(--accent-warn) 7%, var(--surface)); }
+  .hook-card.north { border-color: color-mix(in oklch, var(--accent-primary) 45%, var(--border-subtle)); background: color-mix(in oklch, var(--accent-primary) 7%, var(--surface)); }
+  .hook-card .tag { font-family: var(--font-mono); font-size: 10px; letter-spacing: 0.06em; text-transform: uppercase; color: var(--data-label); margin-bottom: 10px; }
+  .hook-card .temp { font-family: var(--font-mono); font-size: 40px; font-weight: 600; line-height: 1; }
+  .hook-card .temp small { font-size: 16px; color: var(--data-label); font-weight: 400; }
+  .hook-card .why { font-size: 12.5px; color: var(--data-label); margin-top: 9px; line-height: 1.5; }
+  .hook-vs { display: flex; align-items: center; font-family: var(--font-mono); font-size: 12px; color: var(--data-label); }
+  @media (max-width: 760px) { .hook-rooms { grid-template-columns: 1fr; } .hook-vs { justify-content: center; } }
+
+  /* ---------- Ringvägen 98 schematic ---------- */
+  .bldg-grid { display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 28px; align-items: center; }
+  @media (max-width: 900px) { .bldg-grid { grid-template-columns: 1fr; } }
+  .bldg-svg { width: 100%; height: auto; display: block; }
+  .src-list { display: flex; flex-direction: column; gap: 10px; }
+  .src-item { background: var(--surface); border: 1px solid var(--border-subtle); border-radius: 10px; padding: 11px 14px; display: flex; gap: 10px; align-items: baseline; }
+  .src-item .s { font-family: var(--font-mono); font-size: 10px; white-space: nowrap; color: var(--accent-success); }
+  .src-item.syn .s { color: var(--accent-warn); }
+  .src-item .d { font-size: 12px; color: var(--data-label); line-height: 1.5; }
+  .src-item .d strong { color: var(--foreground); font-weight: 600; }
+
+  .pitch-cols.four { grid-template-columns: repeat(4, 1fr); }
+  @media (max-width: 1000px) { .pitch-cols.four { grid-template-columns: repeat(2, 1fr); } }
+  @media (max-width: 640px) { .pitch-cols.four { grid-template-columns: 1fr; } }
+
   /* ---------- slide 2: problem ---------- */
   .problem-grid { display: grid; grid-template-columns: 1.1fr 0.9fr; gap: 44px; align-items: start; }
   .problem-grid p { color: var(--data-label); line-height: 1.7; font-size: 14.5px; }
@@ -391,7 +418,7 @@
 <div class="topbar">
   <div class="brand"><span class="dot"></span>Roomwise <span class="sub">ARENA D · PITCH</span></div>
   <div class="top-right">
-    <span class="slide-counter" id="slideCounter">1 / 11</span>
+    <span class="slide-counter" id="slideCounter">1 / 10</span>
     <button class="icon-btn" id="themeBtn" title="Toggle light/dark">🌙</button>
   </div>
 </div>
@@ -401,18 +428,22 @@
   <!-- 1: title -->
   <section class="slide active" data-slide="0">
     <div class="slide-inner">
-      <div class="kicker">Arena D · Assa Abloy · The Room That Knows Itself</div>
-      <h1 class="headline">Roomwise<br/><span class="accent">per-room setback, not flat.</span></h1>
-      <ul class="pt-list big">
-        <li>One setpoint per room, not per hotel</li>
-        <li>AI reasoning + deterministic math</li>
-        <li>Explains every number</li>
-      </ul>
-      <div class="hero-stats">
-        <div class="stat-chip"><div class="n">8</div><div class="l">signals per room</div></div>
-        <div class="stat-chip"><div class="n">3</div><div class="l">degradation tiers</div></div>
-        <div class="stat-chip"><div class="n">100%</div><div class="l">math shown</div></div>
+      <div class="kicker">Roomwise · Arena D · Assa Abloy · The Room That Knows Itself</div>
+      <h1 class="headline">Two rooms. Same night.<br/><span class="accent">Two different answers.</span></h1>
+      <div class="hook-rooms">
+        <div class="hook-card south">
+          <div class="tag">Room 302 · south corner · floor 6</div>
+          <div class="temp">14.1<small>°C</small></div>
+          <div class="why">Empty until Thursday. Sun on its facade from 11:00 — it coasts deep and lets the sun reheat it.</div>
+        </div>
+        <div class="hook-vs">vs</div>
+        <div class="hook-card north">
+          <div class="tag">Room 318 · north side · floor 4</div>
+          <div class="temp">15.2<small>°C</small></div>
+          <div class="why">Shaded by the neighbor all day. Less room to coast — it holds a warmer floor.</div>
+        </div>
       </div>
+      <p class="lede" style="margin-top:26px;">Both warm again before 15:00 check-in. A flat setback treats them the same.<br/><strong style="color:var(--foreground)">Roomwise doesn't — and it shows its math.</strong></p>
     </div>
   </section>
 
@@ -420,52 +451,89 @@
   <section class="slide" data-slide="1">
     <div class="slide-inner problem-grid">
       <div>
-        <h2 class="section-title">One thermostat setting ≠ one hotel</h2>
+        <h2 class="section-title">Why every hotel runs one flat setback</h2>
         <ul class="pt-list big">
-          <li>Biggest opex + carbon line item: unoccupied heating/cooling</li>
-          <li>Today: one flat setback, every room</li>
-          <li>Ignored: sun, floor, shading, season, bookings</li>
-          <li>Same floor, opposite sides → different needs</li>
-          <li>Nobody hears the guest who complains "too cold"</li>
+          <li>Empty-room heating: a top opex + carbon line</li>
+          <li>Sun, floor, shading, bookings — all knowable, all ignored</li>
+          <li>The real blocker is fear: <strong>one guest, one cold room</strong></li>
+          <li>So setbacks stay shallow. Savings stay on the table</li>
         </ul>
+        <p style="color:var(--data-label);font-size:14.5px;line-height:1.6;max-width:58ch;">Savings is the output. The product is the promise: <strong style="color:var(--foreground)">never miss check-in comfort.</strong> Recovery time is predicted per room, before the setback is applied.</p>
       </div>
       <div class="callout">
-        <div class="t">⚠ Not a black box</div>
+        <div class="t">⚠ Uncertainty policy</div>
         <ul class="pt-list">
-          <li>Every number traceable: signal, confidence, weight</li>
+          <li>Every number traced: signal, confidence, weight</li>
           <li>Signal down → system says so, keeps working</li>
-          <li>Never a silent guess</li>
+          <li>Low confidence → shallower setback. <strong>Doubt favors the guest</strong></li>
         </ul>
       </div>
     </div>
   </section>
 
-  <!-- 3: the opportunity -->
+  <!-- 3: the real building -->
   <section class="slide" data-slide="2">
     <div class="slide-inner">
-      <h2 class="section-title">The opportunity</h2>
-      <p class="section-lede" style="margin-bottom:20px;">1°C, scaled. Illustrative — real math is per-room, live, in the dashboard.</p>
-      <div class="opp-grid">
-        <div class="panel">
-          <div class="panel-title">Assumptions</div>
-          <div class="opp-row">
-            <div class="head"><span>Setback change</span><span id="oDegLbl">1.5°C</span></div>
-            <input type="range" id="oDeg" min="0.5" max="3" step="0.1" value="1.5" />
-          </div>
-          <div class="opp-row">
-            <div class="head"><span>Rooms per hotel</span><span id="oRoomsLbl">150</span></div>
-            <input type="range" id="oRooms" min="50" max="500" step="10" value="150" />
-          </div>
-          <div class="opp-row">
-            <div class="head"><span>Hotels</span><span id="oHotelsLbl">100</span></div>
-            <input type="range" id="oHotels" min="1" max="1000" step="1" value="100" />
-          </div>
-          <div class="opp-note">~1.6 kWh saved / °C / room / day (typical envelope, 20h/day unoccupied) · €0.25/kWh · 0.3 kg CO₂/kWh grid average.</div>
-        </div>
-        <div class="opp-outputs">
-          <div class="opp-card"><div class="tag">Energy saved / year</div><div class="big" id="oKwh">— <small>MWh</small></div></div>
-          <div class="opp-card"><div class="tag">Cost saved / year</div><div class="big" id="oCost">— <small>€</small></div></div>
-          <div class="opp-card"><div class="tag">CO₂ avoided / year</div><div class="big" id="oCo2">— <small>tons</small></div></div>
+      <h2 class="section-title">The building. Not a hypothetical.</h2>
+      <p class="section-lede" style="margin-bottom:20px;">Ringvägen 98, Stockholm — the reference property, as Roomwise sees it from public data alone.</p>
+      <div class="bldg-grid">
+        <svg class="bldg-svg" viewBox="0 0 780 400" aria-label="Ringvägen 98 cross-section">
+          <!-- ground -->
+          <line x1="20" y1="352" x2="760" y2="352" stroke="var(--border-soft)" stroke-width="2"/>
+          <!-- sun -->
+          <g stroke="var(--accent-warn)" stroke-width="2" stroke-linecap="round">
+            <circle cx="700" cy="64" r="17" fill="var(--accent-warn)" fill-opacity="0.25"/>
+            <path d="M700 36v-9M700 101v-9M672 64h-9M737 64h-9M680 44l-6-6M726 90l-6-6M680 84l-6 6M726 44l-6-6"/>
+          </g>
+          <text x="700" y="126" text-anchor="middle" font-family="var(--font-mono)" font-size="10.5" fill="var(--data-label)">25 Aug · solar noon 12:57</text>
+          <!-- sun rays onto south facade -->
+          <g stroke="var(--accent-warn)" stroke-width="1.4" stroke-dasharray="5 5" opacity="0.75">
+            <line x1="678" y1="82" x2="562" y2="152"/>
+            <line x1="672" y1="96" x2="562" y2="200"/>
+            <line x1="665" y1="110" x2="562" y2="252"/>
+          </g>
+          <!-- neighbor building (north) -->
+          <rect x="60" y="187" width="155" height="165" rx="3" fill="var(--surface-2)" stroke="var(--border-soft)"/>
+          <text x="137" y="280" text-anchor="middle" font-family="var(--font-mono)" font-size="10.5" fill="var(--data-label)">neighbor</text>
+          <!-- shade cast on north facade -->
+          <polygon points="215,187 300,232 300,352 215,352" fill="var(--accent-primary)" opacity="0.12"/>
+          <text x="252" y="330" text-anchor="middle" font-family="var(--font-mono)" font-size="10" fill="var(--accent-primary)">shade</text>
+          <!-- main building: 8 floors of 35px, y 72..352 -->
+          <rect x="300" y="72" width="262" height="280" rx="3" fill="var(--surface)" stroke="var(--border-soft)" stroke-width="1.5"/>
+          <!-- guest floors 3-8 tint -->
+          <rect x="301" y="73" width="260" height="209" fill="var(--accent-primary)" opacity="0.07"/>
+          <!-- floor lines + numbers -->
+          <g stroke="var(--border-subtle)">
+            <line x1="300" y1="107" x2="562" y2="107"/><line x1="300" y1="142" x2="562" y2="142"/>
+            <line x1="300" y1="177" x2="562" y2="177"/><line x1="300" y1="212" x2="562" y2="212"/>
+            <line x1="300" y1="247" x2="562" y2="247"/><line x1="300" y1="282" x2="562" y2="282"/>
+            <line x1="300" y1="317" x2="562" y2="317"/>
+          </g>
+          <g font-family="var(--font-mono)" font-size="9.5" fill="var(--data-label)">
+            <text x="312" y="94">8</text><text x="312" y="129">7</text><text x="312" y="164">6</text>
+            <text x="312" y="199">5</text><text x="312" y="234">4</text><text x="312" y="269">3</text>
+            <text x="312" y="304">2</text><text x="312" y="339">1</text>
+          </g>
+          <!-- room 302, floor 6, south -->
+          <rect x="520" y="146" width="38" height="27" rx="3" fill="var(--accent-warn)" opacity="0.35" stroke="var(--accent-warn)"/>
+          <text x="512" y="164" text-anchor="end" font-family="var(--font-mono)" font-size="10.5" fill="var(--foreground)">302 · 14.1°C</text>
+          <!-- room 318, floor 4, north -->
+          <rect x="304" y="216" width="38" height="27" rx="3" fill="var(--accent-primary)" opacity="0.35" stroke="var(--accent-primary)"/>
+          <text x="350" y="234" font-family="var(--font-mono)" font-size="10.5" fill="var(--foreground)">318 · 15.2°C</text>
+          <!-- guest floors bracket -->
+          <path d="M572 73h8v209h-8" fill="none" stroke="var(--data-label)"/>
+          <text x="590" y="172" font-family="var(--font-mono)" font-size="10.5" fill="var(--data-label)">guest rooms</text>
+          <text x="590" y="188" font-family="var(--font-mono)" font-size="10.5" fill="var(--data-label)">floors 3–8</text>
+          <!-- labels -->
+          <text x="431" y="376" text-anchor="middle" font-family="var(--font-mono)" font-size="11.5" fill="var(--foreground)">Ringvägen 98 · 59.31°N 18.07°E</text>
+          <text x="640" y="345" font-family="var(--font-mono)" font-size="10" fill="var(--accent-warn)">south facade</text>
+        </svg>
+        <div class="src-list">
+          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>OSM Overpass</strong> — footprint, orientation, height, neighbor geometry</span></div>
+          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>PVGIS</strong> — facade irradiance today: south 3.4 kWh/m², north 0.9</span></div>
+          <div class="src-item"><span class="s">● LIVE</span><span class="d"><strong>Open-Meteo</strong> — hourly temperature + cloud, 7-day forecast</span></div>
+          <div class="src-item syn"><span class="s">◐ SYNTH</span><span class="d"><strong>Room inventory</strong> — 90 rooms on floors 3–8, derived from the geometry</span></div>
+          <p style="font-size:12.5px;color:var(--data-label);line-height:1.6;margin:8px 2px 0;">Address in → geometry, sun, shading out.<br/><strong style="color:var(--foreground)">No hardware. No site visit.</strong></p>
         </div>
       </div>
     </div>
@@ -474,8 +542,8 @@
   <!-- 4: architecture -->
   <section class="slide" data-slide="3" data-fullbleed="1">
     <div class="slide-inner">
-      <h2 class="section-title">Signals in → one explained number out</h2>
-      <p class="section-lede" style="margin-bottom:20px;">Every stage pluggable — swap providers, harness stays the same.</p>
+      <h2 class="section-title">How it thinks</h2>
+      <p class="section-lede" style="margin-bottom:20px;"><strong style="color:var(--foreground)">AI proposes. Deterministic math decides. Humans override.</strong> Every stage pluggable.</p>
       <div class="pipeline">
         <div class="pipe-stage">
           <svg class="ico"><use href="#i-antenna"/></svg>
@@ -510,14 +578,20 @@
           <div class="d">Setpoint, recovery time, savings, confidence, trace.</div>
         </div>
       </div>
+      <div class="formula-block" style="margin-top:26px;"><span class="k">setback</span> <span class="op">=</span> clamp( <span class="k">physicsBaseline</span> <span class="op">+</span> Σ ( <span class="k">managerWeight</span><sub>i</sub> <span class="op">×</span> <span class="k">aiDirection</span><sub>i</sub> ), MIN, MAX )</div>
+      <ul class="pt-list" style="margin-bottom:0;">
+        <li><strong>Weight per signal</strong> — 0×–2×, per room. One slider</li>
+        <li><strong>Calibration offset</strong> — fix a known bias once, upstream</li>
+        <li><strong>Manual pin</strong> — AI never has the last word. Trace keeps computing</li>
+      </ul>
     </div>
   </section>
 
   <!-- 4: signals detail — what's real, what's mocked, what's next -->
   <section class="slide" data-slide="4">
     <div class="slide-inner">
-      <h2 class="section-title">Signals — live, mocked, next</h2>
-      <p class="section-lede" style="margin-bottom:20px;">Each one a swappable adapter — same shape in, different provider underneath.</p>
+      <h2 class="section-title">What's real. What's mocked. What's next.</h2>
+      <p class="section-lede" style="margin-bottom:20px;">Every signal is an adapter — same shape in, any provider underneath.</p>
       <div class="sig-cols">
         <div class="sig-col live">
           <div class="h">● Live today</div>
@@ -546,112 +620,44 @@
     </div>
   </section>
 
-  <!-- 5: modifier example -->
-  <section class="slide" data-slide="5">
+  <!-- 6: one signal, traced -->
+  <section class="slide" data-slide="5" data-fullbleed="1">
     <div class="slide-inner">
-      <h2 class="section-title">Modifiers — example: staleness decay</h2>
-      <div class="flow-row">
-        <div class="flow-card">
-          <div class="tag">Raw reading</div>
-          <div class="big">22.7<small>°C</small></div>
-          <div class="line">Cached, 30 min old. Tier 2. Confidence 0.85.</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-card hi">
-          <div class="tag">decayStaleness()</div>
-          <div class="big" style="font-size:16px;line-height:1.5;">confidence × 0.75<br/><span style="font-size:22px;">0.85 → 0.64</span></div>
-          <div class="line">Tier 2: −25%. Tier 3: −60%.</div>
-        </div>
-        <div class="flow-arrow">→</div>
-        <div class="flow-card">
-          <div class="tag">Reaches reasoner as</div>
-          <div class="big">22.7<small>°C · conf 0.64</small></div>
-          <div class="line">Same value. Pulls a third as hard.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 6: AI reasoning traced example -->
-  <section class="slide" data-slide="6">
-    <div class="slide-inner">
-      <h2 class="section-title">AI reasoning — one signal, traced</h2>
+      <h2 class="section-title">One signal, end to end</h2>
+      <p class="section-lede" style="margin-bottom:20px;">Outdoor temperature, from a stale cache to its exact share of the answer.</p>
       <div class="flow-row">
         <div class="flow-card">
           <div class="tag">Signal in</div>
           <div class="big">−6.0<small>°C</small></div>
-          <div class="line"><code style="font-family:var(--font-mono);font-size:11px;">weather.outdoor_temp</code> · tier 1 · conf 0.9</div>
+          <div class="line"><code style="font-family:var(--font-mono);font-size:11px;">weather.outdoor_temp</code><br/>Cached 30 min ago · tier 2.</div>
+        </div>
+        <div class="flow-arrow">→</div>
+        <div class="flow-card">
+          <div class="tag">Staleness decay</div>
+          <div class="big" style="font-size:22px;">conf 0.85 → 0.64</div>
+          <div class="line">Same value, pulls a third less hard. Tier 3 → excluded.</div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-card hi">
           <div class="tag">🧠 Reasoning</div>
-          <div class="line" style="margin-top:0;">"Cold outside — keep a warmer margin."<br/><br/><code style="font-family:var(--font-mono);font-size:10.5px;">clamp((5 − v) × 0.03, −0.5, 0.8)</code><br/>Or: same call, in words, by an LLM.</div>
+          <div class="line" style="margin-top:0;">"Cold outside — keep a warmer margin."<br/><br/><code style="font-family:var(--font-mono);font-size:10.5px;">clamp((5 − v) × 0.03, −0.5, 0.8)</code><br/>Same call, in words, by an LLM.</div>
         </div>
         <div class="flow-arrow">→</div>
         <div class="flow-card">
           <div class="tag">Judgment out</div>
-          <div class="big">+0.33<small>°C, conf 0.9</small></div>
-          <div class="line">A bounded nudge, not a setpoint.</div>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 7: combiner -->
-  <section class="slide" data-slide="7">
-    <div class="slide-inner">
-      <h2 class="section-title">Combiner — one formula, three controls</h2>
-      <div class="formula-block"><span class="k">setback</span> <span class="op">=</span> clamp( <span class="k">physicsBaseline</span> <span class="op">+</span> Σ ( <span class="k">managerWeight</span><sub>i</sub> <span class="op">×</span> <span class="k">aiDirection</span><sub>i</sub> ), MIN, MAX )</div>
-      <div class="control-cols">
-        <div class="pitch-col">
-          <div class="num">Per-signal weight</div>
-          <h3>0× – 2×, per signal, per room</h3>
-          <p>One slider. Nothing else changes.</p>
-        </div>
-        <div class="pitch-col">
-          <div class="num">Calibration offset</div>
-          <h3>Fix a known bias</h3>
-          <p>Dial it in once, upstream.</p>
-        </div>
-        <div class="pitch-col">
-          <div class="num">AI / override toggle</div>
-          <h3>AI never has the last word</h3>
-          <p>Manual pin. Trace keeps computing.</p>
-        </div>
-      </div>
-    </div>
-  </section>
-
-  <!-- 8: pitch closing -->
-  <section class="slide" data-slide="8">
-    <div class="slide-inner">
-      <h2 class="section-title">The pitch</h2>
-      <div class="pitch-cols">
-        <div class="pitch-col">
-          <div class="num">01 · End user</div>
-          <h3>Hotel ops &amp; engineering managers</h3>
-          <p>Own comfort complaints + energy bill. One dial per signal, not one blunt setpoint.</p>
-        </div>
-        <div class="pitch-col">
-          <div class="num">02 · Where it deploys</div>
-          <h3>Overlay, not rip-and-replace</h3>
-          <p>Sits next to the existing BMS. No new hardware to start.</p>
-        </div>
-        <div class="pitch-col">
-          <div class="num">03 · How it scales</div>
-          <h3>One room to a portfolio</h3>
-          <p>Add a property = add rows. Not a re-architecture.</p>
+          <div class="big">+0.33<small>°C</small></div>
+          <div class="line">A bounded nudge, not a setpoint. The combiner does the rest.</div>
         </div>
       </div>
     </div>
   </section>
 
   <!-- 5: live dashboard / simulator -->
-  <section class="slide" data-slide="9" data-fullbleed="1" data-noscroll="1">
+  <section class="slide" data-slide="6" data-fullbleed="1" data-noscroll="1">
     <div class="slide-inner">
       <div class="dash-head">
-        <h2 class="section-title" style="margin-bottom:6px;">Live dashboard</h2>
-        <p class="section-lede" style="margin-bottom:14px;">Same rules as production. Drag a signal. Flip a tier to <span class="tier-label-3">unavailable</span>. Try a preset.</p>
+        <h2 class="section-title" style="margin-bottom:6px;">Live dashboard — rooms of Ringvägen 98</h2>
+        <p class="section-lede" style="margin-bottom:14px;">Same rules as production. Drag a signal. Flip one to <span class="tier-label-3">DOWN</span> — or kill them all: it still answers, safely, and says why.</p>
         <div class="presets" id="presets"></div>
       </div>
 
@@ -707,13 +713,78 @@
     </div>
   </section>
 
-  <!-- 10: thanks -->
-  <section class="slide" data-slide="10">
+  <!-- 8: this building, then every building -->
+  <section class="slide" data-slide="7">
+    <div class="slide-inner">
+      <h2 class="section-title">This building. Then every building.</h2>
+      <p class="section-lede" style="margin-bottom:20px;">Left: the per-room engine across Ringvägen 98's 90 rooms, vs a flat 16°C setback. Right: your portfolio.</p>
+      <div class="opp-grid">
+        <div class="opp-outputs">
+          <div class="opp-card"><div class="tag">Ringvägen 98 · today</div><div class="big">345 <small>kWh not burned</small></div></div>
+          <div class="opp-card"><div class="tag">Per year</div><div class="big">€31,500 <small>· 38 t CO₂</small></div></div>
+          <div class="opp-note" style="margin-top:0;">90 rooms · avg 2.4°C deeper than flat, where each room allows it · same math as the dashboard.</div>
+        </div>
+        <div class="panel">
+          <div class="panel-title">Your portfolio</div>
+          <div class="opp-row">
+            <div class="head"><span>Setback deepened by</span><span id="oDegLbl">1.5°C</span></div>
+            <input type="range" id="oDeg" min="0.5" max="3" step="0.1" value="1.5" />
+          </div>
+          <div class="opp-row">
+            <div class="head"><span>Rooms per hotel</span><span id="oRoomsLbl">150</span></div>
+            <input type="range" id="oRooms" min="50" max="500" step="10" value="150" />
+          </div>
+          <div class="opp-row">
+            <div class="head"><span>Hotels</span><span id="oHotelsLbl">100</span></div>
+            <input type="range" id="oHotels" min="1" max="1000" step="1" value="100" />
+          </div>
+          <div class="opp-outputs" style="flex-direction:row;gap:10px;margin-top:16px;">
+            <div class="opp-card" style="flex:1;padding:14px 16px;"><div class="tag">MWh / yr</div><div class="big" style="font-size:22px;" id="oKwh">—</div></div>
+            <div class="opp-card" style="flex:1;padding:14px 16px;"><div class="tag">€ / yr</div><div class="big" style="font-size:22px;" id="oCost">—</div></div>
+            <div class="opp-card" style="flex:1;padding:14px 16px;"><div class="tag">t CO₂ / yr</div><div class="big" style="font-size:22px;" id="oCo2">—</div></div>
+          </div>
+          <div class="opp-note">~1.6 kWh / °C / room / day · €0.25/kWh · 0.3 kg CO₂/kWh.</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 9: deploy & scale -->
+  <section class="slide" data-slide="8">
+    <div class="slide-inner">
+      <h2 class="section-title">Who buys it. Where it sits. How it scales.</h2>
+      <div class="pitch-cols four">
+        <div class="pitch-col">
+          <div class="num">01 · End user</div>
+          <h3>Ops &amp; engineering managers</h3>
+          <p>They own the cold-room complaint and the energy bill. Roomwise removes the trade-off between them.</p>
+        </div>
+        <div class="pitch-col">
+          <div class="num">02 · Deploys as</div>
+          <h3>Overlay on the BMS</h3>
+          <p>Recommends setpoints to the system already there. No rip-and-replace, no new hardware.</p>
+        </div>
+        <div class="pitch-col">
+          <div class="num">03 · Cold start</div>
+          <h3>From a street address</h3>
+          <p>Address → OSM geometry → PVGIS facades → room inventory → recommendations. Day one, zero integration.</p>
+        </div>
+        <div class="pitch-col">
+          <div class="num">04 · With Assa Abloy</div>
+          <h3>The lock knows the room is empty</h3>
+          <p>Occupancy from hardware already on millions of doors. Distribution comes built in.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- 10: close -->
+  <section class="slide" data-slide="9">
     <div class="slide-inner thanks-wrap">
-      <h1>Thank you.</h1>
-      <p>Roomwise — per-room, explainable, degrades gracefully. Questions?</p>
+      <h1>Every room already<br/>knows itself.</h1>
+      <p style="font-size:22px;color:var(--foreground);">We taught it to speak.</p>
       <div class="thanks-tags">
-        <span>Signals → Modifiers → AI reasoning → Deterministic combiner → Recommendation</span>
+        <span>Roomwise · Ringvägen 98, today: 345 kWh not burned — every degree explained</span>
       </div>
     </div>
   </section>
@@ -844,9 +915,9 @@
       var annualCost = annualKwh * PRICE_PER_KWH;
       var annualCo2Tons = (annualKwh * CO2_PER_KWH) / 1000;
 
-      kwhEl.innerHTML = fmt(annualKwh / 1000) + " <small>MWh</small>";
-      costEl.innerHTML = fmt(annualCost) + " <small>€</small>";
-      co2El.innerHTML = fmt(annualCo2Tons) + " <small>tons</small>";
+      kwhEl.textContent = fmt(annualKwh / 1000);
+      costEl.textContent = fmt(annualCost);
+      co2El.textContent = fmt(annualCo2Tons);
     }
 
     [deg, rooms, hotels].forEach(function (el) { el.oninput = renderOpp; });
@@ -857,9 +928,9 @@
   var MIN_SETBACK = 13.5, MAX_SETBACK = 20, FLAT_BASELINE = 16, COMFORT_TEMP = 21, UNOCC_HOURS = 20;
 
   var ROOMS = {
-    exec: { label: "Corner Suite", detail: "high glazing · 3.1 W/K·m²", baselineC: 13.8, uaDensity: 3.1, uaTotal: 93, confidence: 0.9 },
-    standard: { label: "Interior Standard", detail: "low glazing · 2.0 W/K·m²", baselineC: 14.3, uaDensity: 2.0, uaTotal: 60, confidence: 0.85 },
-    penthouse: { label: "Top-floor Penthouse", detail: "roof load · 3.6 W/K·m²", baselineC: 13.5, uaDensity: 3.6, uaTotal: 108, confidence: 0.8 },
+    exec: { label: "302 · South corner", detail: "floor 6 · sun-heated · 3.1 W/K·m²", baselineC: 14.7, uaDensity: 3.1, uaTotal: 93, confidence: 0.9 },
+    standard: { label: "318 · North side", detail: "floor 4 · shaded · 2.0 W/K·m²", baselineC: 15.8, uaDensity: 2.0, uaTotal: 60, confidence: 0.85 },
+    penthouse: { label: "801 · Top floor", detail: "roof load · 3.6 W/K·m²", baselineC: 14.0, uaDensity: 3.6, uaTotal: 108, confidence: 0.8 },
   };
 
   var SIGNAL_DEFS = [
